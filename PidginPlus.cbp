@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Pidgin Plus!" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="pidgin_plus.so">
+				<Option output="bin/Release/libPidginPlus" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Environment>
+				<Variable name="CFLAGS" value='&quot;pkg-config --cflags purple&quot;' />
+			</Environment>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add option="pkg-config --libs purple" />
+		</Linker>
+		<Unit filename="commands.cc" />
+		<Unit filename="commands.h" />
+		<Unit filename="date_time.cc" />
+		<Unit filename="date_time.h" />
+		<Unit filename="gtk_timer_struct.h" />
+		<Unit filename="macros.cc" />
+		<Unit filename="macros.h" />
+		<Unit filename="plugin_template.cc" />
+		<Unit filename="purple_extension.cc" />
+		<Unit filename="purple_extension.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
