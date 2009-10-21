@@ -65,23 +65,26 @@ extern PurplePlugin *pidgin_plus_plugin;
 
 
 const char* command_string_msgplus[] = {
-  "addcontact","appearoffline","available","away",
-  "block","blockgrp","brb","busy","close", "emails","invite",
-  "lock","lunch","msg", "noicon","online","onphone","page",
-  "phone", "ping","profile","sendfile","sendmail","signout",
-  "unblock","unblockgrp","video","voice"
+  "addcontact","appearoffline","available","away", //4
+  "block","blockgrp","brb","busy","close", "emails","invite", //7
+  "lock","lunch","msg", "noicon","online","onphone","page", //7
+  "phone", "ping","profile","sendfile","sendmail","signout", //6
+  "unblock","unblockgrp","video","voice" //4
 };
 #define CMDFLAG_BASIC PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
 #define CMDFLAG_NOCHAT PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
 
 const int NUM_MSGPLUS_COMMANDS = sizeof(command_string_msgplus) / sizeof(char*);
 
-const char* command_description_msgplus[] = {
-  "Add a new contact with given username/email (depending on protocol)","Set status to invisible on supported protocols","Set status to available","Set status to a supported variant of away",
-  "Block the current user(s) in the conversation, or by name/email","Block an entire group by name","Set status to 'Be right back' or an available equivalent","Set status to busy","Close the current conversation",
-  "I'm not sure what /emails does","Invite a contact to this conversation","Lock pidgin, if the function is ever implemented","Set status to 'Out to Lunch' on old MSN protocol","No idea what /msg does",
-  "Remove smilies from outgoing messages on MSN Plus!","Set status to 'Available'","Set status to 'In a Call'","No idea.","Starts a phone call, I think",
-  "profile","sendfile","sendmail","signout",
+const char* command_description_msgplus[NUM_MSGPLUS_COMMANDS] = {
+  "Add a new contact with given username/email (depending on protocol)","Set status to invisible on supported protocols",
+      "Set status to available","Set status to a supported variant of away",
+  "Block the current user(s) in the conversation, or by name/email","Block an entire group by name",
+      "Set status to 'Be right back' or an available equivalent","Set status to busy","Close the current conversation",
+      "I'm not sure what /emails does","Invite a contact to this conversation",
+  "Lock pidgin, if the function is ever implemented","Set status to 'Out to Lunch' on old MSN protocol","No idea what /msg does",
+      "Remove smilies from outgoing messages on MSN Plus!","Set status to 'Available'","Set status to 'In a Call'","No idea.",
+  "Starts a phone call, I think","Ping your buddy, if he or she has Plus!","profile","sendfile","sendmail","signout",
   "unblock","unblockgrp","video","voice"
 };
 

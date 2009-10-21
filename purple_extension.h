@@ -24,3 +24,6 @@ string buddy_get_alias(PurpleAccount* account,string email);
 string get_my_name(PurpleAccount* account);
 string get_my_email(PurpleAccount* account);
 string get_my_ip();
+
+void set_receiving_window(PurpleConversation* conv);
+void pidgin_printf(const char* message);

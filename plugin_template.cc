@@ -107,6 +107,8 @@ static PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar 
   return PURPLE_CMD_RET_OK;
 }
 
+int plus_v8_end();
+int plus_v8_init();
 static gboolean plugin_load (PurplePlugin * plugin)
 {
   pidgin_plus_plugin = plugin; /* assign this here so we have a valid handle later */
@@ -114,9 +116,12 @@ static gboolean plugin_load (PurplePlugin * plugin)
   purple_signal_connect(purple_conversations_get_handle(), "sending-im-msg", plugin, PURPLE_CALLBACK(sending_im_msg), NULL);
   
   for (int i = 0; i < NUM_MSGPLUS_COMMANDS; i++)
-  COMMANDS_MSGPLUS[i] = purple_cmd_register(command_string_msgplus[i], "w", PURPLE_CMD_P_PLUGIN,(PurpleCmdFlag)(PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS),	
+  {
+    printf("%d of %d: 0x%8X and 0x%8X\r\n",i,NUM_MSGPLUS_COMMANDS,(unsigned)command_string_msgplus[i],(unsigned)command_description_msgplus[i]);
+    COMMANDS_MSGPLUS[i] = purple_cmd_register(command_string_msgplus[i], "w", PURPLE_CMD_P_PLUGIN,(PurpleCmdFlag)(PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS),	
                          NULL, PURPLE_CMD_FUNC(slash_command_handler), command_description_msgplus[i], NULL);
-  
+  }
+  plus_v8_init();
   return TRUE;
 }
 
@@ -124,6 +129,7 @@ static gboolean plugin_unload(PurplePlugin *plugin)
 {
   for (int i=0; i<NUM_MSGPLUS_COMMANDS; i++)
     purple_cmd_unregister(COMMANDS_MSGPLUS[i]);
+  plus_v8_end();
 }
 
 

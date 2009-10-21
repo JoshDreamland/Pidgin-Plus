@@ -1,16 +1,14 @@
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <semaphore.h>
 
 #include <map>
 #include <string>
 using namespace std;
 
-#include "v8.h"
+#include "google_v8/v8-read-only/include/v8.h"
 using namespace v8;
-
-#include "plus_structures.h"
+extern string tostring(long double x);
+extern void pidgin_printf(const char*);
 
 struct PPlus_Script
 {
@@ -26,35 +24,26 @@ Handle<Value> Print(const Arguments& args);
 Handle<Value> Quit(const Arguments& args);
 void ReportException(TryCatch* handler);
 
-int main(int argc, char* argv[])
+HandleScope handle_to_global_scope;
+Handle<ObjectTemplate> global_object_template = ObjectTemplate::New();;
+Handle<Context> GlobalContext = Context::New(NULL, global_object_template);;
+Context::Scope context_scope(GlobalContext);
+
+int plus_v8_init()
 {
-  V8::SetFlagsFromCommandLine(&argc, argv, true);
-  HandleScope handle_scope;
-  // Create a template for the global object.
-  Handle<ObjectTemplate> global = ObjectTemplate::New();
-  // Bind the global 'print' function to the C++ Print callback.
-  global->Set(String::New("print"), FunctionTemplate::New(Print)); //This explains a lot
-  global->Set(String::New("quit"), FunctionTemplate::New(Quit));
-  
-  // Create a new execution environment containing the built-in functions
-  Handle<Context> GlobalContext = Context::New(NULL, global);
-  
-  //Plus_JSI_Init(GlobalContext);
-  
-  // Enter the newly created execution environment.
-  Context::Scope context_scope(GlobalContext);
-  
-  printf("V8 version %s\n", V8::GetVersion());
-  while (true)
-  {
-    char strb[4096]; printf("> ");
-    char *str = fgets(strb, 4096, stdin);
-    if (str == NULL) break;
-    v8::HandleScope handle_scope;
-    ExecuteString(String::New(str), String::New("(shell)"), true, true);
-  }
-  
-  V8::Dispose(); //What the FACK is dispose()?
+  global_object_template->Set(String::New("print"), FunctionTemplate::New(Print)); //This explains a lot
+}
+
+int plus_evaluate_js_line(const char* line)
+{
+  v8::HandleScope handle_scope;
+  ExecuteString(String::New(line), String::New("(shell)"), true, true);
+  return 0;
+}
+
+int plus_v8_end()
+{
+  V8::Dispose();
   return 0;
 }
 
@@ -74,16 +63,10 @@ Handle<Value> Print(const Arguments& args)
   for (int i = 0; i < args.Length(); i++)
   {
     HandleScope handle_scope;
-    if (first)
-      first = false;
-    else
-      printf(" ");
     String::Utf8Value str(args[i]);
     const char* cstr = ToCString(str);
-    printf("%s", cstr);
+    pidgin_printf(cstr);
   }
-  printf("\n");
-  fflush(stdout);
   return Undefined();
 }
 
@@ -98,6 +81,7 @@ Handle<Value> Quit(const Arguments& args)
   exit(exit_code);
   return Undefined();
 }
+
 
 string ValueToStr(Handle<Value> val)
 {
@@ -114,7 +98,6 @@ bool load_script(Handle<String> source, Handle<Value> name)
   scripts[ValueToStr(name)].script = scr;
   return 1;
 }
-
 // Executes a string within the current v8 context.
 bool ExecuteString(Handle<String> source, Handle<Value> name, bool print_result, bool report_exceptions)
 {
@@ -136,7 +119,7 @@ bool ExecuteString(Handle<String> source, Handle<Value> name, bool print_result,
       {
         String::Utf8Value str(result);
         const char* cstr = ToCString(str,"Result cannot be converted to string");
-        printf("%s\n", cstr);
+        pidgin_printf(cstr);
       }
       return true;
     }
@@ -156,7 +139,7 @@ void ReportException(TryCatch* try_catch)
   {
     // V8 didn't provide any extra information about this error; just
     // print the exception.
-    printf("%s\n", exception_string);
+    pidgin_printf(exception_string);
   }
   else
   {
@@ -164,18 +147,18 @@ void ReportException(TryCatch* try_catch)
     String::Utf8Value filename(message->GetScriptResourceName());
     const char* filename_string = ToCString(filename);
     int linenum = message->GetLineNumber();
-    printf("%s:%i: %s\n", filename_string, linenum, exception_string);
+    string eff = string(filename_string) + ", line " + tostring(linenum) + ": " + exception_string;
     // Print line of source code.
     String::Utf8Value sourceline(message->GetSourceLine());
     const char* sourceline_string = ToCString(sourceline);
-    printf("%s\n", sourceline_string);
+    eff += string("\n") + sourceline_string + "\n";
     // Print wavy underline (GetUnderline is deprecated).
     int start = message->GetStartColumn();
     for (int i = 0; i < start; i++)
-      printf(" ");
+      eff+=" ";
     int end = message->GetEndColumn();
     for (int i = start; i < end; i++)
-      printf("^");
-    printf("\n");
+      eff += "^";
+    pidgin_printf(eff.c_str());
   }
 }

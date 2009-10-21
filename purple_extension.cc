@@ -93,3 +93,13 @@ string get_my_ip()
   return "Oh, let me just look that up for you.";
 }
 
+PurpleConversation* conv_to_print_to;
+void set_receiving_window(PurpleConversation* conv)
+{
+  conv_to_print_to = conv;
+}
+void pidgin_printf(const char* message)
+{
+  purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);
+}
+

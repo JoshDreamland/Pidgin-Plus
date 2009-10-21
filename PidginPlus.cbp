@@ -41,6 +41,7 @@
 		<Unit filename="plugin_template.cc" />
 		<Unit filename="purple_extension.cc" />
 		<Unit filename="purple_extension.h" />
+		<Unit filename="v8_implementation.cc" />
 		<Extensions>
 			<code_completion />
 			<debugger />
