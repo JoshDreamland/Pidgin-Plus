@@ -66,7 +66,8 @@ void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg)
 string buddy_get_uname(PurpleAccount* account,string email)
 {
   PurpleBuddy *b = purple_find_buddy(account, email.c_str());
-  return purple_buddy_get_server_alias(b);
+  if (b) return purple_buddy_get_server_alias(b);
+  return email;
 }
 
 string buddy_get_alias(PurpleAccount* account,string email)

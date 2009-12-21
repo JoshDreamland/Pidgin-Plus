@@ -232,7 +232,7 @@ bool filter_outgoing(bool me_sending,PurpleAccount *account, const char *receive
       m = (flags & PURPLE_MESSAGE_RECV) ?
       "<font color = \"#00C000\"><i>Pong! [" + tostring_time(ps->second.popwithreturn()) + "]</i></color>" : "<font color = \"#00C000\"><i>Pong! [resps]</i></color>";
     }
-    else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':')
+    else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':') //Handle JS: as a temporary hax
       if (conv != NULL)
       {
         set_receiving_window(conv);
