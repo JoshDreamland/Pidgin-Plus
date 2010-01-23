@@ -130,7 +130,7 @@ bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, g
           chaterror("Failed to block user. Sorry.");
       break;
     case cmd_blockgrp:
-        chaterror("Not implemented: Groups in pidgin? Yikes.");
+        chaterror("Not implemented: Working with groups in pidgin? Yikes.");
       break;
     case cmd_brb:
         all_accounts_set_status(PURPLE_STATUS_AWAY,"");
@@ -158,7 +158,7 @@ bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, g
         chaterror("Unimplemented: Dunno what this does.");
       break;
     case cmd_noicon:
-        
+        //Prepend 0x08 to the outgoing message
       break;
     case cmd_online:
         all_accounts_set_status(PURPLE_STATUS_AVAILABLE,"");
@@ -167,7 +167,7 @@ bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, g
         all_accounts_set_status(PURPLE_STATUS_UNAVAILABLE,"On the phone");
       break;
     case cmd_page:
-        
+        chaterror("What does this even do?");
       break;
     case cmd_phone:
         chaterror("Not implemented. Are you KIDDING me?");
