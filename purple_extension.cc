@@ -66,25 +66,29 @@ void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg)
 string buddy_get_uname(PurpleAccount* account,string email)
 {
   PurpleBuddy *b = purple_find_buddy(account, email.c_str());
-  if (b) return purple_buddy_get_server_alias(b);
-  return email;
+  if (b == NULL)
+    return email;
+  const char* n = purple_buddy_get_server_alias(b);
+  return n? n : email;
 }
-
 string buddy_get_alias(PurpleAccount* account,string email)
 {
   PurpleBuddy *b = purple_find_buddy(account, email.c_str());
-  return purple_buddy_get_contact_alias(b);
+  const char *a = purple_buddy_get_contact_alias(b);
+  return a? a : email;
+}
+string buddy_get_status(PurpleAccount* account,string email)
+{
+  return "<insert buddy's status here ^_^>";
 }
 
-
-
-string get_my_name(PurpleAccount* account)
-{
+string get_my_name(PurpleAccount* account) {
   return "LibPurple sucks.";
 }
-
-string get_my_email(PurpleAccount* account)
-{
+string get_my_email(PurpleAccount* account) {
+  return "I mean, LibPurple REALLY sucks.";
+}
+string get_my_status(PurpleAccount* account) {
   return "I mean, LibPurple REALLY sucks.";
 }
 
@@ -94,13 +98,22 @@ string get_my_ip()
   return "Oh, let me just look that up for you.";
 }
 
+//This will simplify the Purple-V8 bridge
+int conv_to_print_to_type;
 PurpleConversation* conv_to_print_to;
-void set_receiving_window(PurpleConversation* conv)
+enum { pct_im = 0, pct_chat = 1 };
+
+void set_receiving_window(PurpleConversation* conv, int window_type)
 {
   conv_to_print_to = conv;
+  conv_to_print_to_type = window_type;
 }
 void pidgin_printf(const char* message)
 {
-  purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);
+  switch (conv_to_print_to_type)
+  {
+    case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
+    case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
+  }
 }
 

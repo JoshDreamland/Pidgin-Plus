@@ -80,6 +80,12 @@ string tostring(long double x)
   sprintf(retc,"%Lf",x);
   return retc;
 }
+string tostring(int x)
+{
+  static char retc[24];
+  sprintf(retc,"%d",x);
+  return retc;
+}
 string tostring_time(long double x)
 {
   if (x < 0) return "?????";
@@ -126,7 +132,7 @@ inline string lpos(string s,unsigned int p)
 
 
 extern int plus_evaluate_js_line(const char* line);
-bool filter_outgoing(bool me_sending,PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)
+bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)
 {
   unsigned int f;
   string m = *message;
@@ -156,8 +162,14 @@ bool filter_outgoing(bool me_sending,PurpleAccount *account, const char *receive
             r=1, rw = get_my_email(account);
           else if (c == "IP")
             r=1, rw = get_my_ip();
+          else if (c == "MYPSM")
+            r=1, rw = get_my_status(account);
           else if (c == "N")
             r=1, rw = buddy_get_uname(account,rs);
+          else if (c == "NN")
+            r=1, rw = buddy_get_alias(account,rs);
+          else if (c == "PSM")
+            r=1, rw = buddy_get_status(account,rs);
           else if (c == "M")
             r=1, rw = rs;
           else if (c == "D")
@@ -232,10 +244,10 @@ bool filter_outgoing(bool me_sending,PurpleAccount *account, const char *receive
       m = (flags & PURPLE_MESSAGE_RECV) ?
       "<font color = \"#00C000\"><i>Pong! [" + tostring_time(ps->second.popwithreturn()) + "]</i></color>" : "<font color = \"#00C000\"><i>Pong! [resps]</i></color>";
     }
-    else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':') //Handle JS: as a temporary hax
+    else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':') //Handle "JS:" as a temporary hax
       if (conv != NULL)
       {
-        set_receiving_window(conv);
+        set_receiving_window(conv,window_type);
         plus_evaluate_js_line(cm + 3);
       }
     g_free(cm);

@@ -49,11 +49,12 @@
 #include <savedstatuses.h>
 #include <conversation.h>
 
-#include "macros.h"
-#include "commands.h"
-
 #include <string>
 using namespace std;
+
+#include "macros.h"
+#include "commands.h"
+#include "purple_extension.h"
 
 /* we're adding this here and assigning it in plugin_load because we need
  * a valid plugin handle for our call to purple_notify_message() in the
@@ -74,7 +75,7 @@ plugin_action_test_cb (PurplePluginAction * action)
 
 void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
 {
-  if (filter_outgoing(true,account,receiver,message))
+  if (filter_outgoing(true,pct_im,account,receiver,message))
   {
     g_free(*message);
     *message = NULL;
@@ -83,7 +84,7 @@ void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
 
 static gboolean writing_im_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
 {
-  return filter_outgoing(false,account,who,message,conv,flags);
+  return filter_outgoing(false,pct_im,account,who,message,conv,flags);
 }
 
 
@@ -99,7 +100,7 @@ void sending_chat_msg(PurpleAccount *account, char **message, int id)
     usernames += ", ";
   }
   
-  if (filter_outgoing(true,account,usernames.c_str(),message))
+  if (filter_outgoing(true,pct_chat,account,usernames.c_str(),message))
   {
     g_free(*message);
     *message = NULL;
@@ -118,7 +119,7 @@ static gboolean writing_chat_msg(PurpleAccount *account, const char *who, char *
     usernames += ", ";
   }
   if (conv == NULL) msgbox("It's official");
-  return filter_outgoing(false,account,usernames.c_str(),message,conv,flags);
+  return filter_outgoing(false,pct_chat,account,usernames.c_str(),message,conv,flags);
 }
 
 
@@ -150,8 +151,8 @@ int plus_v8_init();
 static gboolean plugin_load (PurplePlugin * plugin)
 {
   pidgin_plus_plugin = plugin; /* assign this here so we have a valid handle later */
-  purple_signal_connect(purple_conversations_get_handle(), "writing-im-msg", plugin, PURPLE_CALLBACK(writing_im_msg), NULL);
-  purple_signal_connect(purple_conversations_get_handle(), "sending-im-msg", plugin, PURPLE_CALLBACK(sending_im_msg), NULL);
+  purple_signal_connect(purple_conversations_get_handle(), "writing-im-msg",   plugin, PURPLE_CALLBACK(writing_im_msg), NULL);
+  purple_signal_connect(purple_conversations_get_handle(), "sending-im-msg",   plugin, PURPLE_CALLBACK(sending_im_msg), NULL);
   purple_signal_connect(purple_conversations_get_handle(), "sending-chat-msg", plugin, PURPLE_CALLBACK(sending_chat_msg), NULL);
   purple_signal_connect(purple_conversations_get_handle(), "writing-chat-msg", plugin, PURPLE_CALLBACK(writing_chat_msg), NULL);
   
@@ -167,6 +168,11 @@ static gboolean plugin_load (PurplePlugin * plugin)
 
 static gboolean plugin_unload(PurplePlugin *plugin)
 {
+  purple_signal_disconnect(purple_conversations_get_handle(), "writing-im-msg",   plugin, PURPLE_CALLBACK(writing_im_msg));
+  purple_signal_disconnect(purple_conversations_get_handle(), "sending-im-msg",   plugin, PURPLE_CALLBACK(sending_im_msg));
+  purple_signal_disconnect(purple_conversations_get_handle(), "sending-chat-msg", plugin, PURPLE_CALLBACK(sending_chat_msg));
+  purple_signal_disconnect(purple_conversations_get_handle(), "writing-chat-msg", plugin, PURPLE_CALLBACK(writing_chat_msg));
+  
   for (int i=0; i<NUM_MSGPLUS_COMMANDS; i++)
     purple_cmd_unregister(COMMANDS_MSGPLUS[i]);
   plus_v8_end();

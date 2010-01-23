@@ -19,11 +19,16 @@
  */
 
 void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg);
+
 string buddy_get_uname(PurpleAccount* account,string email);
 string buddy_get_alias(PurpleAccount* account,string email);
+string buddy_get_status(PurpleAccount* account,string email);
+
 string get_my_name(PurpleAccount* account);
 string get_my_email(PurpleAccount* account);
+string get_my_status(PurpleAccount* account);
 string get_my_ip();
 
-void set_receiving_window(PurpleConversation* conv);
-void pidgin_printf(const char* message);
+void set_receiving_window(PurpleConversation* conv,int window_type); //Set the window that will receive script output
+void pidgin_printf(const char* message); //Print to the window in question.
+enum { pct_im = 0, pct_chat = 1 }; //Type of the window in question, or any window in question.

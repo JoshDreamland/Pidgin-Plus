@@ -1,3 +1,24 @@
+/*
+ * Pidgin Plus! Plugin
+ *
+ * Copyright (C) 2009 Josh Ventura
+ *
+ * Pidgin Plus! is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <www.gnu.org/licenses>
+ *
+ */
+
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -6,80 +27,58 @@
 using namespace std;
 
 #include "google_v8/v8-read-only/include/v8.h"
+
 using namespace v8;
-extern string tostring(long double x);
+extern string tostring(int x);
 extern void pidgin_printf(const char*);
 
 struct PPlus_Script
 {
   Handle<Script> script;
-  Handle<Context> context;
+  //Handle<Context> context;
 };
 
 map <string, PPlus_Script> scripts;
 
+//Functions
+  bool          ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions);
+  void          ReportException(TryCatch* handler);
+  Handle<Value> Print(const Arguments& args);
 
-bool ExecuteString(Handle<String> source, Handle<Value> name, bool print_result, bool report_exceptions);
-Handle<Value> Print(const Arguments& args);
-Handle<Value> Quit(const Arguments& args);
-void ReportException(TryCatch* handler);
 
-HandleScope handle_to_global_scope;
-Handle<ObjectTemplate> global_object_template = ObjectTemplate::New();;
-Handle<Context> GlobalContext = Context::New(NULL, global_object_template);;
-Context::Scope context_scope(GlobalContext);
+HandleScope               handle_to_global_scope; //Nothingness scope
+Handle<ObjectTemplate>    global_object_template = ObjectTemplate::New(); //Containing global "this"
+Handle<Context>           global_context; //Global Context
 
 int plus_v8_init()
 {
-  global_object_template->Set(String::New("print"), FunctionTemplate::New(Print)); //This explains a lot
+  js_functions_initialize(); // see javascript_functions.cc
+  global_context = Context::New(NULL, global_object_template);
 }
 
 int plus_evaluate_js_line(const char* line)
 {
   v8::HandleScope handle_scope;
-  ExecuteString(String::New(line), String::New("(shell)"), true, true);
+  ExecuteString(String::New(line), "(shell)", true, true);
   return 0;
 }
 
+//If V8 is unloaded here, attempts to 
+//reenable it will result in segfault
 int plus_v8_end()
+{
+  return 0;
+}
+
+//Until the pidgin devs bother to only load plugins when 
+//they are enabled, the V8 engine will remain in memory.
+
+//This can be called when a device to destroy a plugin
+//Is not only implemented, but actually effing used.
+int plus_v8_wipe()
 {
   V8::Dispose();
   return 0;
-}
-
-// Extracts a C string from a V8 Utf8Value.
-const char* ToCString(const String::Utf8Value& value,const char* ifnull = "<string conversion failed>")
-{
-  return *value ? *value : ifnull;
-}
-
-
-// The callback that is invoked by v8 whenever the JavaScript 'print'
-// function is called.  Prints its arguments on stdout separated by
-// spaces and ending with a newline.
-Handle<Value> Print(const Arguments& args)
-{
-  bool first = true;
-  for (int i = 0; i < args.Length(); i++)
-  {
-    HandleScope handle_scope;
-    String::Utf8Value str(args[i]);
-    const char* cstr = ToCString(str);
-    pidgin_printf(cstr);
-  }
-  return Undefined();
-}
-
-
-// The callback that is invoked by v8 whenever the JavaScript 'quit'
-// function is called.  Quits.
-Handle<Value> Quit(const Arguments& args)
-{
-  // If not arguments are given args[0] will yield undefined which
-  // converts to the integer value 0.
-  int exit_code = args[0]->Int32Value();
-  exit(exit_code);
-  return Undefined();
 }
 
 
@@ -90,22 +89,27 @@ string ValueToStr(Handle<Value> val)
 }
 
 //Returns true if successful
-bool load_script(Handle<String> source, Handle<Value> name)
+bool load_script(Handle<String> source, string name)
 {
-  Handle<Script> scr = Script::Compile(source, name);
+  Handle<Script> scr = Script::Compile(source, String::New(name.c_str()));
   if (scr.IsEmpty())
     return 0;
-  scripts[ValueToStr(name)].script = scr;
+  scripts[name].script = scr;
   return 1;
 }
 // Executes a string within the current v8 context.
-bool ExecuteString(Handle<String> source, Handle<Value> name, bool print_result, bool report_exceptions)
+bool ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions)
 {
   TryCatch try_catch;
+  Context::Scope scope(global_context);
+  
+  //Renew "limited" script resources
+  js_resources_renew(); //Like time, and number of print() calls
+  
   if (load_script(source,name))
   {
     HandleScope handle_scope;
-    Handle<Value> result = scripts[ValueToStr(name)].script->Run();
+    Handle<Value> result = scripts[name].script->Run();
     if (result.IsEmpty())
     {
       // Print errors that happened during execution.
