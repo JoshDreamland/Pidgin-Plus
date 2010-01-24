@@ -18,6 +18,15 @@
  *
  */
 
+/**
+  @file date_time.cc
+  @summary This file exists only because it's inconvenient to
+    make all these calls when they are actually needed. Though
+    the file is mostly redundant, I'd prefer it be so here rather
+    than in the middle of the commands and macros code. These
+    functions are mostly self-explanatory.
+*/
+
 #include <string>
 using namespace std;
 

@@ -18,6 +18,12 @@
  *
  */
 
+/**
+  @file v8_implementations.cc
+  @summary This file is another unoriginal waste heap, for
+    the most part. It handles most of the initialization of
+    Google V8. The rest is done implicitly in v8_shared.cc
+*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -26,17 +32,17 @@
 #include <string>
 using namespace std;
 
-#include "google_v8/v8-read-only/include/v8.h"
+//Assuming those who want to compile this have 
+//checked out V8 as per my well-hidden instruction
+#include "v8_shared.h"
 
 using namespace v8;
 extern string tostring(int x);
 extern void pidgin_printf(const char*);
 
-struct PPlus_Script
-{
-  Handle<Script> script;
-  //Handle<Context> context;
-};
+//Include the file that actually does things
+#include "js_functions.h"
+
 
 map <string, PPlus_Script> scripts;
 
@@ -45,10 +51,6 @@ map <string, PPlus_Script> scripts;
   void          ReportException(TryCatch* handler);
   Handle<Value> Print(const Arguments& args);
 
-
-HandleScope               handle_to_global_scope; //Nothingness scope
-Handle<ObjectTemplate>    global_object_template = ObjectTemplate::New(); //Containing global "this"
-Handle<Context>           global_context; //Global Context
 
 int plus_v8_init()
 {
@@ -79,13 +81,6 @@ int plus_v8_wipe()
 {
   V8::Dispose();
   return 0;
-}
-
-
-string ValueToStr(Handle<Value> val)
-{
-  const String::Utf8Value str(val);
-  return *str ? *str : "ERROR: Cannot convert output to string";
 }
 
 //Returns true if successful

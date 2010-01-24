@@ -18,170 +18,105 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/**
+  @file plugin_template.cc
+  @summary This file is almost entirely syntactical doodoo to make happy 
+    the connection between the plugin and pidgin. The goal is to have as
+    little original code in this file as possible so it can be discarded
+    as a waste heap. Comments were left to help the curious navigate.
+*/
 
-/* config.h may define PURPLE_PLUGINS; protect the definition here so that we
- * don't get complaints about redefinition when it's not necessary. */
-#ifndef PURPLE_PLUGINS
-# define PURPLE_PLUGINS
-#endif
+/*
+   Some includes
+*/
+    #ifdef HAVE_CONFIG_H
+    # include <config.h>
+    #endif
 
-#include <glib.h>
+    // config.h may define PURPLE_PLUGINS; protect the definition here so that we
+    // don't get complaints about redefinition when it's not necessary.
+    #ifndef PURPLE_PLUGINS
+    # define PURPLE_PLUGINS
+    #endif
 
-/* This will prevent compiler errors in some instances and is better explained in the
- * how-to documents on the wiki */
-#ifndef G_GNUC_NULL_TERMINATED
-# if __GNUC__ >= 4
-#  define G_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-# else
-#  define G_GNUC_NULL_TERMINATED
-# endif
-#endif
+    #include <glib.h>
 
-#include <notify.h>
-#include <plugin.h>
-#include <version.h>
+    /* This will prevent compiler errors in some instances and is better explained in the
+     * how-to documents on the wiki */
+    #ifndef G_GNUC_NULL_TERMINATED
+    # if __GNUC__ >= 4
+    #  define G_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
+    # else
+    #  define G_GNUC_NULL_TERMINATED
+    # endif
+    #endif
 
-#include <cmds.h>
-#include <privacy.h>
-#include <savedstatuses.h>
-#include <conversation.h>
+/*
+   This file's few actual dependencies
+*/
+    #include <notify.h>
+    #include <plugin.h>
+    #include <version.h>
 
-#include <string>
-using namespace std;
 
-#include "macros.h"
-#include "commands.h"
-#include "purple_extension.h"
+/*
+   This is where the real code is
+*/
+  #include "plugin_events.h"
 
-/* we're adding this here and assigning it in plugin_load because we need
- * a valid plugin handle for our call to purple_notify_message() in the
- * plugin_action_test_cb() callback function */
-PurplePlugin *pidgin_plus_plugin = NULL;
+/*
+   This doesn't mean anything.
+*/
+  // we're adding this here and assigning it in plugin_load because we need
+  // a valid plugin handle for our call to purple_notify_message() in the
+  // plugin_action_test_cb() callback function */
+  PurplePlugin *pidgin_plus_plugin = NULL;
 
-/* This function is the callback for the plugin action we added. All we're
- * doing here is displaying a message. When the user selects the plugin
- * action, this function is called. */
-static void
-plugin_action_test_cb (PurplePluginAction * action)
-{
+  // we tell libpurple in the PurplePluginInfo struct to call this function to
+  // get a list of plugin actions to use for the plugin.  This function gives
+  // libpurple that list of actions. */
   
-}
-
-
-
-
-void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
-{
-  if (filter_outgoing(true,pct_im,account,receiver,message))
-  {
-    g_free(*message);
-    *message = NULL;
-  }
-}
-
-static gboolean writing_im_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
-{
-  return filter_outgoing(false,pct_im,account,who,message,conv,flags);
-}
-
-
-void sending_chat_msg(PurpleAccount *account, char **message, int id)
-{
-  PurpleConversation* c = purple_find_chat (purple_account_get_connection(account), id);
-  PurpleConvChat* cc = purple_conversation_get_chat_data(c);
-  GList* u = purple_conv_chat_get_users(cc);
-  string usernames;
-  for (; u != NULL; u = u->next)
-  {
-    usernames += purple_conv_chat_cb_get_name((PurpleConvChatBuddy*)u->data);
-    usernames += ", ";
-  }
-  
-  if (filter_outgoing(true,pct_chat,account,usernames.c_str(),message))
-  {
-    g_free(*message);
-    *message = NULL;
-  }
-}
-
-#define msgbox(STRHERE) purple_notify_message (pidgin_plus_plugin, PURPLE_NOTIFY_MSG_INFO, "Info", STRHERE, NULL, NULL, NULL)
-static gboolean writing_chat_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
-{
-  PurpleConvChat* cc = purple_conversation_get_chat_data(conv);
-  GList* u = purple_conv_chat_get_users(cc);
-  string usernames;
-  for (; u != NULL; u = u->next)
-  {
-    usernames += purple_conv_chat_cb_get_name((PurpleConvChatBuddy*)u->data);
-    usernames += ", ";
-  }
-  if (conv == NULL) msgbox("It's official");
-  return filter_outgoing(false,pct_chat,account,usernames.c_str(),message,conv,flags);
-}
-
-
-
-
-
-/* we tell libpurple in the PurplePluginInfo struct to call this function to
- * get a list of plugin actions to use for the plugin.  This function gives
- * libpurple that list of actions. */
+/*
+   This is a list of plugin actions from the demo plugin. It is no longer in use.
+*/
 static GList *plugin_actions (PurplePlugin * plugin, gpointer context)
 {
   GList *list = NULL;
   PurplePluginAction *action = NULL;
-  
+  /*
   action = purple_plugin_action_new ("Plugin Action Test", plugin_action_test_cb);
-  list = g_list_append (list, action);
+  list = g_list_append (list, action);*/
   
   return list;
 }
 
-static PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data)
-{
-  execute_command(conv,cmd,args,error,data);
-  return PURPLE_CMD_RET_OK;
-}
 
+/*
+   Make calls to files that matter.
+   I told you this file was a waste heap.
+*/
 int plus_v8_end();
 int plus_v8_init();
 static gboolean plugin_load (PurplePlugin * plugin)
 {
-  pidgin_plus_plugin = plugin; /* assign this here so we have a valid handle later */
-  purple_signal_connect(purple_conversations_get_handle(), "writing-im-msg",   plugin, PURPLE_CALLBACK(writing_im_msg), NULL);
-  purple_signal_connect(purple_conversations_get_handle(), "sending-im-msg",   plugin, PURPLE_CALLBACK(sending_im_msg), NULL);
-  purple_signal_connect(purple_conversations_get_handle(), "sending-chat-msg", plugin, PURPLE_CALLBACK(sending_chat_msg), NULL);
-  purple_signal_connect(purple_conversations_get_handle(), "writing-chat-msg", plugin, PURPLE_CALLBACK(writing_chat_msg), NULL);
-  
-  for (int i = 0; i < NUM_MSGPLUS_COMMANDS; i++)
-  {
-    printf("%d of %d: 0x%8X and 0x%8X\r\n",i,NUM_MSGPLUS_COMMANDS,(unsigned)command_string_msgplus[i],(unsigned)command_description_msgplus[i]);
-    COMMANDS_MSGPLUS[i] = purple_cmd_register(command_string_msgplus[i], "w", PURPLE_CMD_P_PLUGIN,(PurpleCmdFlag)(PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS),	
-                         NULL, PURPLE_CMD_FUNC(slash_command_handler), command_description_msgplus[i], NULL);
-  }
+  pidgin_plus_plugin = plugin;   //Assign this here so we have a valid handle later
+  plus_events_connect_signals(plugin); //Tell Pidgin what events we'll be calling. See plugin_events.cc in this directory.
+  plus_commands_register();      //Gain control of Plus!'s commands
   plus_v8_init();
   return TRUE;
 }
 
 static gboolean plugin_unload(PurplePlugin *plugin)
 {
-  purple_signal_disconnect(purple_conversations_get_handle(), "writing-im-msg",   plugin, PURPLE_CALLBACK(writing_im_msg));
-  purple_signal_disconnect(purple_conversations_get_handle(), "sending-im-msg",   plugin, PURPLE_CALLBACK(sending_im_msg));
-  purple_signal_disconnect(purple_conversations_get_handle(), "sending-chat-msg", plugin, PURPLE_CALLBACK(sending_chat_msg));
-  purple_signal_disconnect(purple_conversations_get_handle(), "writing-chat-msg", plugin, PURPLE_CALLBACK(writing_chat_msg));
-  
-  for (int i=0; i<NUM_MSGPLUS_COMMANDS; i++)
-    purple_cmd_unregister(COMMANDS_MSGPLUS[i]);
+  plus_events_disconnect_signals(plugin);
+  plus_commands_free();
   plus_v8_end();
   return true;
 }
 
 
-/* For specific notes on the meanings of each of these members, consult the C Plugin Howto
- * on the website. */
+// For specific notes on the meanings of each of these members, consult the C Plugin Howto
+// on the website.
 static PurplePluginInfo info = {
   PURPLE_PLUGIN_MAGIC,
   PURPLE_MAJOR_VERSION,
@@ -202,13 +137,11 @@ static PurplePluginInfo info = {
   NULL, NULL, NULL, NULL //Not 2.0.0
 };
 
+//This would do something if anything in this plugin could be loaded and unloaded without freeing global memory <_<"
+static void init_plugin (PurplePlugin *plugin) { }
 
-static void init_plugin (PurplePlugin *plugin)
-{
-  
-}
-
-
+//C++ gives the whole process gas. 
+//Before you go making fun of C++, consider that V8 Operates in it.
 extern "C"
 {
   PURPLE_INIT_PLUGIN (hello_world, init_plugin, info)

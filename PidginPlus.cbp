@@ -31,17 +31,28 @@
 		<Linker>
 			<Add option="pkg-config --libs purple" />
 		</Linker>
-		<Unit filename="commands.cc" />
-		<Unit filename="commands.h" />
-		<Unit filename="date_time.cc" />
-		<Unit filename="date_time.h" />
-		<Unit filename="gtk_timer_struct.h" />
-		<Unit filename="macros.cc" />
-		<Unit filename="macros.h" />
-		<Unit filename="plugin_template.cc" />
-		<Unit filename="purple_extension.cc" />
-		<Unit filename="purple_extension.h" />
-		<Unit filename="v8_implementation.cc" />
+		<Unit filename="basics/basics.cc">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="basics/basics.h" />
+		<Unit filename="commands_and_macros/commands.cc" />
+		<Unit filename="commands_and_macros/commands.h" />
+		<Unit filename="commands_and_macros/macros.cc" />
+		<Unit filename="commands_and_macros/macros.h" />
+		<Unit filename="gtk_etc_frontend/date_time.cc" />
+		<Unit filename="gtk_etc_frontend/date_time.h" />
+		<Unit filename="gtk_etc_frontend/gtk_timer_struct.h" />
+		<Unit filename="plugin_basics/plugin_events.cc" />
+		<Unit filename="plugin_basics/plugin_events.h" />
+		<Unit filename="plugin_basics/plugin_template.cc" />
+		<Unit filename="purple_frontend/purple_extension.cc" />
+		<Unit filename="purple_frontend/purple_extension.h" />
+		<Unit filename="scripting/js_functions.cc" />
+		<Unit filename="scripting/js_functions.h" />
+		<Unit filename="scripting/v8_implementation.cc" />
+		<Unit filename="scripting/v8_shared.cc" />
+		<Unit filename="scripting/v8_shared.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -17,32 +17,20 @@
  * along with this program; if not, see <www.gnu.org/licenses>
  *
  */
-
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-/* config.h may define PURPLE_PLUGINS; protect the definition here so that we
- * don't get complaints about redefinition when it's not necessary. */
-#ifndef PURPLE_PLUGINS
-# define PURPLE_PLUGINS
-#endif
-
-#include <glib.h>
-
-/* This will prevent compiler errors in some instances and is better explained in the
- * how-to documents on the wiki */
-#ifndef G_GNUC_NULL_TERMINATED
-# if __GNUC__ >= 4
-#  define G_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-# else
-#  define G_GNUC_NULL_TERMINATED
-# endif
-#endif
-
-#include <notify.h>
-#include <plugin.h>
-#include <version.h>
+ 
+/**
+   @file commands.cc
+   @summary This file breaks down the large list of Plus!
+     commands into a few arrays; one containing the names,
+     one the help text for Pidgin, then an enum of their
+     IDs (each corresponding to an item in the first two
+     arrays), and finally a function containing a switch
+     statement to execute the appropriate one on call.
+     
+     This mechanism makes it possible to submit the whole
+     list of commands to Pidgin using a for loop instead
+     of bloated, redundant code.
+*/
 
 #include <cmds.h>
 #include <privacy.h>
@@ -53,15 +41,12 @@
 #include <string>
 using namespace std;
 
-#include "macros.h"
-#include "commands.h"
-#include "purple_extension.h"
+#include "commands.h" //This
+#include "../purple_frontend/purple_extension.h"  //Simplify
 
 extern PurplePlugin *pidgin_plus_plugin;
 #define msgbox(STRHERE) purple_notify_message (pidgin_plus_plugin, PURPLE_NOTIFY_MSG_INFO, "Info", STRHERE, NULL, NULL, NULL)
 #define chaterror(x) purple_conversation_write(conv, "", x, PURPLE_MESSAGE_NO_LOG, time(NULL))
-
-
 
 
 const char* command_string_msgplus[] = {
@@ -71,9 +56,9 @@ const char* command_string_msgplus[] = {
   "phone", "ping","profile","sendfile","sendmail","signout", //6
   "unblock","unblockgrp","video","voice" //4
 };
+
 #define CMDFLAG_BASIC PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
 #define CMDFLAG_NOCHAT PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
-
 const int NUM_MSGPLUS_COMMANDS = sizeof(command_string_msgplus) / sizeof(char*);
 
 const char* command_description_msgplus[NUM_MSGPLUS_COMMANDS] = {

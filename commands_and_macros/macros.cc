@@ -17,28 +17,17 @@
  * along with this program; if not, see <www.gnu.org/licenses>
  *
  */
-
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-/* config.h may define PURPLE_PLUGINS; protect the definition here so that we
- * don't get complaints about redefinition when it's not necessary. */
-#ifndef PURPLE_PLUGINS
-# define PURPLE_PLUGINS
-#endif
-
-#include <glib.h>
-
-/* This will prevent compiler errors in some instances and is better explained in the
- * how-to documents on the wiki */
-#ifndef G_GNUC_NULL_TERMINATED
-# if __GNUC__ >= 4
-#  define G_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-# else
-#  define G_GNUC_NULL_TERMINATED
-# endif
-#endif
+ 
+ /**
+   @file macros.cc
+   @summary In Pidgin Plus!, "macro" refers to any segment
+     of message that will be replaced by more text later.
+     These include (!N), which is replaced with the name
+     (if available) of the other contact(s) in the chat.
+     Because text replacement accounts for the majority of
+     the reason we bother having events at this point,
+     filter_outgoing is also defined in this file.
+ */
 
 #include <notify.h>
 #include <plugin.h>
@@ -60,39 +49,11 @@ extern PurplePlugin *pidgin_plus_plugin;
 #include <string>
 using namespace std;
 
-#include "date_time.h"
-#include "gtk_timer_struct.h"
-#include "purple_extension.h"
+#include "../gtk_etc_frontend/date_time.h"        //Fetch date/time info
+#include "../gtk_etc_frontend/gtk_timer_struct.h" //Ping timing
+#include "../purple_frontend/purple_extension.h"  //Simplify
 
-inline bool is_letterd(char c)
-{ 
-  return (c >= 'A' and c <= 'Z') or (c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or c == '_';
-}
-
-inline bool is_white(char c)
-{
-  return c == ' ' or c == '\t' or c == '\r' or c == '\n';
-}
-
-string tostring(long double x)
-{
-  static char retc[24];
-  sprintf(retc,"%Lf",x);
-  return retc;
-}
-string tostring(int x)
-{
-  static char retc[24];
-  sprintf(retc,"%d",x);
-  return retc;
-}
-string tostring_time(long double x)
-{
-  if (x < 0) return "?????";
-  static char retc[24];
-  sprintf(retc,"%Lf sec",x);
-  return retc;
-}
+#include "../basics/basics.h"
 
 bool command_interpret(string m,unsigned int p,PurpleAccount *account)
 { 
@@ -119,17 +80,6 @@ map<string,timestack> conv_pingclocks;
 
 int d=0;
 const char * hexa = "0123456789ABCDEF";
-inline bool is_letter(char a)
-{
-  return (a >= 'A' and a <= 'Z') or (a >= 'a' and a <= 'z');
-}
-inline string lpos(string s,unsigned int p)
-{
-  if (s[p] >= 'A' and s[p] <= 'Z') 
-    s[p] -= 'A'-'a'; 
-  return s;
-}
-
 
 extern int plus_evaluate_js_line(const char* line);
 bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)

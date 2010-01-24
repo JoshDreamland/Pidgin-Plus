@@ -18,27 +18,17 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-/* config.h may define PURPLE_PLUGINS; protect the definition here so that we
- * don't get complaints about redefinition when it's not necessary. */
-#ifndef PURPLE_PLUGINS
-# define PURPLE_PLUGINS
-#endif
-
-#include <glib.h>
-
-/* This will prevent compiler errors in some instances and is better explained in the
- * how-to documents on the wiki */
-#ifndef G_GNUC_NULL_TERMINATED
-# if __GNUC__ >= 4
-#  define G_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-# else
-#  define G_GNUC_NULL_TERMINATED
-# endif
-#endif
+/**
+   @file purple_extension.cc
+   @summary Contrary to the implications of the filename, this header
+     is merely intended to function as a wrapper to sets of libpurple
+     calls, in order to shrink code and disambiguate calls. Frankly,
+     it becomes too big a pain in the ass to constantly anticipate
+     every single scenario that different protocols can bring to an
+     otherwise simple situation. If I had to code with such vague and
+     often ambiguous cross-protocol terms as the Pidgin developers, I
+     would go bat-shit insane. Props to them.
+*/
 
 #include <notify.h>
 #include <plugin.h>
@@ -48,9 +38,6 @@
 #include <privacy.h>
 #include <savedstatuses.h>
 #include <conversation.h>
-
-#include "macros.h"
-#include "commands.h"
 
 #include <string>
 using namespace std;
