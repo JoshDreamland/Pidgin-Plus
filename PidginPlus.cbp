@@ -50,6 +50,10 @@
 		<Unit filename="purple_frontend/purple_extension.h" />
 		<Unit filename="scripting/js_functions.cc" />
 		<Unit filename="scripting/js_functions.h" />
+		<Unit filename="scripting/js_objects/chatwnd.cc" />
+		<Unit filename="scripting/js_objects/js_objects_basics.cc" />
+		<Unit filename="scripting/js_objects/js_objects_basics.h" />
+		<Unit filename="scripting/js_objects/msgplus.cc" />
 		<Unit filename="scripting/v8_implementation.cc" />
 		<Unit filename="scripting/v8_shared.cc" />
 		<Unit filename="scripting/v8_shared.h" />

@@ -18,31 +18,8 @@
  *
  */
 
+#include "../v8_shared.h"
 
-// Print things, limit to 25 messages a time, reset each parse call
-int prints_remaining = 25;
-Handle<Value> Print(const Arguments& args)
-{
-  bool first = true;
-  for (int i = 0; i < args.Length(); i++)
-  {
-    HandleScope handle_scope;
-    String::Utf8Value str(args[i]);
-    const char* cstr = ToCString(str);
-    pidgin_printf(cstr);
-    if (prints_remaining-- <= 0)
-      return ThrowException(String::New("Too many prints called in one script event"));
-  }
-  return Undefined();
-}
-
-void js_functions_initialize()
-{
-  global_object_template->Set(String::New("print"), FunctionTemplate::New(Print)); //This explains a lot
-  
-}
-
-void js_resources_renew()
-{
-  prints_remaining = 25;
+void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
+  global_object_template->Set(String::New(name), obj);
 }
