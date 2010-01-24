@@ -1,7 +1,7 @@
 CFLAGS = `pkg-config --cflags purple`
 LIBS = `pkg-config --libs purple`
 
-OBJECTS = plugin_basics/plugin_template.o plugin_basics/plugin_events.o commands_and_macros/macros.o commands_and_macros/commands.o purple_frontend/purple_extension.o gtk_etc_frontend/date_time.o scripting/v8_implementation.o scripting/v8_shared.o scripting/js_functions.o basics/basics.o
+OBJECTS = basics/basics.o plugin_basics/plugin_template.o plugin_basics/plugin_events.o commands_and_macros/macros.o commands_and_macros/commands.o purple_frontend/purple_extension.o gtk_etc_frontend/date_time.o scripting/v8_implementation.o scripting/v8_shared.o scripting/js_functions.o scripting/js_objects/js_objects_basics.o scripting/js_objects/chatwnd.o scripting/js_objects/msgplus.o
 
 
 %.so: $(OBJECTS)
