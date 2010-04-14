@@ -81,6 +81,15 @@ map<string,timestack> conv_pingclocks;
 int d=0;
 const char * hexa = "0123456789ABCDEF";
 
+unsigned skip_html(string m, unsigned p)
+{
+  while (m[p] == '<')
+    while (m[p] and m[p++] != '>')
+      if (m[p]=='"') while (m[++p] and m[p] != '"') if (m[p]=='\\') p++;
+      else if (m[p]=='\'') while (m[++p] and m[p] != '\'') if (m[p]=='\\') p++;
+  return p;
+}
+
 extern int plus_evaluate_js_line(const char* line);
 bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)
 {
@@ -90,10 +99,7 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
   
   for (unsigned int p = 0; p < m.length(); p++)
   {
-    while (m[p] == '<')
-      while (m[p] and m[p++] != '>') 
-        if (m[p]=='"') while (m[++p] and m[p] != '"') if (m[p]=='\\') p++;
-        else if (m[p]=='\'') while (m[++p] and m[p] != '\'') if (m[p]=='\\') p++;
+    p = skip_html(m,p);
     if (m[p] == '(' and m[p+1] == '!')
     {
       const unsigned int pstart = p++;
@@ -116,7 +122,9 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
             r=1, rw = get_my_status(account);
           else if (c == "N")
             r=1, rw = buddy_get_uname(account,rs);
-          else if (c == "NN")
+          else if (c == "NN") //Return nick name
+            r=1, rw = buddy_get_alias(account,rs);
+          else if (c == "ME") //Return original sender
             r=1, rw = buddy_get_alias(account,rs);
           else if (c == "PSM")
             r=1, rw = buddy_get_status(account,rs);

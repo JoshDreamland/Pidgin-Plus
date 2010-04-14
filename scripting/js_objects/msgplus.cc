@@ -19,6 +19,25 @@
  */
 
 #include "js_objects_basics.h"
+#include <stdlib.h>
+
+double vs_to_double(const char* x)
+{
+  bool rdot = 0;
+  string s = x;
+  while (*(x++))
+  {
+    if (*x == '.')
+    {
+      if (!rdot)
+        s += *x;
+      rdot = true;
+    }
+    else
+      s += *x;
+  }
+  return atof(s.c_str());
+}
 
 struct MsgPlus
 {
@@ -42,10 +61,30 @@ struct MsgPlus
       }
     } version;
     
+    struct _v8version
+    {
+      Handle<ObjectTemplate> me;
+      
+      static Handle<Value> toString(const Arguments& args) {
+        return String::New((string("Google V8 version ") + V8::GetVersion()).c_str());
+      }
+      static Handle<Value> valueOf (const Arguments& args) {
+        return Number::New(vs_to_double(V8::GetVersion()));
+      }
+      
+      _v8version(): me(ObjectTemplate::New()) {
+        me->Set(String::New("toString"), FunctionTemplate::New(toString) );
+        me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
+      }
+    } v8_version;
+    
   Foundational:
   
   MsgPlus(): me(ObjectTemplate::New()) {
     me->Set(String::New("version"), version.me);
+    me->Set(String::New("js_version"), v8_version.me);
+    me->Set(String::New("javascript_version"), v8_version.me);
+    me->Set(String::New("jsVersion"), v8_version.me);
   }
 } *inst_MsgPlus = NULL;
 
