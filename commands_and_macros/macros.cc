@@ -93,7 +93,6 @@ unsigned skip_html(string m, unsigned p)
 extern int plus_evaluate_js_line(const char* line);
 bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)
 {
-  unsigned int f;
   string m = *message;
   string rs = receiver;
   

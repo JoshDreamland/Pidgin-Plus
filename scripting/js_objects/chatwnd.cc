@@ -32,13 +32,17 @@ struct ChatWnd
   
       static Handle<Value> SendMessage(const Arguments& args)
       {
-        bool first = true;
         for (int i = 0; i < args.Length(); i++)
         {
           HandleScope handle_scope;
           String::Utf8Value str(args[i]);
-          const char* cstr = ToCString(str);
-          pidgin_printf(cstr);
+          string cstr = ToCString(str);
+          if (cstr.length() > 512)
+          {
+            cstr.erase(511);
+            cstr[508] = cstr[509] = cstr[510] = '.';
+          }
+          pidgin_printf(cstr.c_str());
           if (prints_remaining-- <= 0)
             return ThrowException(String::New("Too many messages sent in one script event"));
         }

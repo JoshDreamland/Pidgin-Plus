@@ -29,6 +29,7 @@
 */
 
 #include <string>
+#include <stdio.h>
 using namespace std;
 
 string tostring(long double x)

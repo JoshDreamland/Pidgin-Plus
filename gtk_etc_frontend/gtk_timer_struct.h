@@ -22,9 +22,8 @@ struct timequeue
   node *pushtime()
   {
     if (first == NULL)
-      first = last = new node();
-    else
-      last = last->next = new node();
+      return first = last = new node();
+    return last = last->next = new node();
   }
   double popwithreturn()
   {
@@ -67,7 +66,7 @@ struct timestack
   
   node *pushtime()
   {
-    top = new node(top);
+    return top = new node(top);
   }
   double popwithreturn()
   {

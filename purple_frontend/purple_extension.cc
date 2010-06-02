@@ -80,6 +80,13 @@ string get_my_status(PurpleAccount* account) {
 }
 
 
+// Test the protocol used by a given conversation for a match to the given string
+bool conversation_protocol_match(PurpleConversation* conv,const char* str) {
+  const char* pn = purple_plugin_get_name(purple_find_prpl(conv->account->protocol_id));
+  string pname = pn; return (pname.find(str) != string::npos);
+}
+
+
 string get_my_ip()
 {
   return "Oh, let me just look that up for you.";
@@ -97,10 +104,14 @@ void set_receiving_window(PurpleConversation* conv, int window_type)
 }
 void pidgin_printf(const char* message)
 {
+  static int oncallstack = false;
+  if (oncallstack) return;
+  oncallstack = true;
   switch (conv_to_print_to_type)
   {
     case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
     case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
   }
+  oncallstack = false;
 }
 

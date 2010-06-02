@@ -186,4 +186,5 @@ bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, g
         
       break;
   }
+  return false;
 }

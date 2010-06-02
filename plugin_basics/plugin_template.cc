@@ -81,13 +81,15 @@
 */
 static GList *plugin_actions (PurplePlugin * plugin, gpointer context)
 {
+  /* // This is to be used when Plus! supports enough to justify it
   GList *list = NULL;
   PurplePluginAction *action = NULL;
-  /*
-  action = purple_plugin_action_new ("Plugin Action Test", plugin_action_test_cb);
-  list = g_list_append (list, action);*/
   
-  return list;
+  action = purple_plugin_action_new ("Plugin Action Test", plugin_action_test_cb);
+  list = g_list_append (list, action);
+  */
+  
+  return NULL;
 }
 
 
@@ -102,6 +104,12 @@ static gboolean plugin_load (PurplePlugin * plugin)
   pidgin_plus_plugin = plugin;   //Assign this here so we have a valid handle later
   plus_events_connect_signals(plugin); //Tell Pidgin what events we'll be calling. See plugin_events.cc in this directory.
   plus_commands_register();      //Gain control of Plus!'s commands
+  
+  //Implement threading for JS
+  if (!g_thread_get_initialized())
+    g_thread_init(NULL);
+  
+  //Initialize V8
   plus_v8_init();
   return TRUE;
 }

@@ -30,6 +30,7 @@
 
 #include <map>
 #include <string>
+#include <glib/glib.h>
 using namespace std;
 
 //Assuming those who want to compile this have 
@@ -56,6 +57,7 @@ int plus_v8_init()
 {
   js_functions_initialize(); // see javascript_functions.cc
   global_context = Context::New(NULL, global_object_template);
+  return 0;
 }
 
 int plus_evaluate_js_line(const char* line)
@@ -70,6 +72,16 @@ int plus_evaluate_js_line(const char* line)
 int plus_v8_end()
 {
   return 0;
+}
+
+//Kill the running V8 thread if it's been going on too long
+int CALL_ID = 0;    
+gpointer kill_v8_if_it_takes_too_long(gpointer data)
+{
+  usleep(1000000); //Unix only. Sorry Windows fans, go fuck yourselves.
+  if (CALL_ID == int(data))
+    V8::TerminateExecution();
+  return NULL;
 }
 
 //Until the pidgin devs bother to only load plugins when 
@@ -104,7 +116,16 @@ bool ExecuteString(Handle<String> source, string name, bool print_result, bool r
   if (load_script(source,name))
   {
     HandleScope handle_scope;
-    Handle<Value> result = scripts[name].script->Run();
+    
+    //Thread a killer and run the code.
+    Handle<Value> result;
+    try {
+      g_thread_create(kill_v8_if_it_takes_too_long,(gpointer)CALL_ID,false,NULL);
+      result = scripts[name].script->Run();
+      CALL_ID++;
+    } catch(int x) { result = String::New("A system exception was thrown."); }
+      catch(const char* x) { result = String::New(x); }
+    
     if (result.IsEmpty())
     {
       // Print errors that happened during execution.
@@ -117,8 +138,13 @@ bool ExecuteString(Handle<String> source, string name, bool print_result, bool r
       if (print_result && !result->IsUndefined())
       {
         String::Utf8Value str(result);
-        const char* cstr = ToCString(str,"Result cannot be converted to string");
-        pidgin_printf(cstr);
+        string cstr = ToCString(str,"Result cannot be converted to string");
+        if (cstr.length() > 512)
+        {
+          cstr.erase(511);
+          cstr[508] = cstr[509] = cstr[510] = '.';
+        }
+        pidgin_printf(cstr.c_str());
       }
       return true;
     }
