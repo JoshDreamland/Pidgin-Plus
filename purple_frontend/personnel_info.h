@@ -18,10 +18,13 @@
  *
  */
  
- extern const int NUM_MSGPLUS_COMMANDS;
+//These commands fetch info for a buddy by "email," where "email" may actually be any of the things you are requesting.
+string buddy_get_uname(PurpleAccount* account,string email);
+string buddy_get_alias(PurpleAccount* account,string email);
+string buddy_get_status(PurpleAccount* account,string email);
 
-extern PurpleCmdId COMMANDS_MSGPLUS[];
-extern const char *command_string_msgplus[];
-extern const char *command_description_msgplus[];
-
-int execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *error, void *data);
+//None of these work. I think get_my_email returns one of its own parameters. Somehow.
+string get_my_name(PurpleAccount* account);
+string get_my_email(PurpleAccount* account);
+string get_my_status(PurpleAccount* account);
+string get_my_ip();

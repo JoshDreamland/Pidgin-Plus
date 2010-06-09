@@ -60,8 +60,16 @@ int plus_v8_init()
   return 0;
 }
 
+string lastmessages[3];
 int plus_evaluate_js_line(const char* line)
 {
+  if (lastmessages[2] == lastmessages[1] and lastmessages[1] == lastmessages[0] and lastmessages[0] == line)
+    line = "\"Fuck you.\"";
+  else {
+    lastmessages[2] = lastmessages[1];
+    lastmessages[1] = lastmessages[0];
+    lastmessages[0] = line;
+  }
   v8::HandleScope handle_scope;
   ExecuteString(String::New(line), "(shell)", true, true);
   return 0;

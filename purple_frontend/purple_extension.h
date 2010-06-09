@@ -25,16 +25,9 @@ using std::string;
 #include <status.h>
 void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg); //Drop the lingo and set the damn display text.
 
-//These commands fetch info for a buddy by "email," where "email" may actually be any of the things you are requesting.
-string buddy_get_uname(PurpleAccount* account,string email);
-string buddy_get_alias(PurpleAccount* account,string email);
-string buddy_get_status(PurpleAccount* account,string email);
+#include "personnel_info.h"
 
-//None of these work. I think get_my_email returns one of its own parameters. Somehow.
-string get_my_name(PurpleAccount* account);
-string get_my_email(PurpleAccount* account);
-string get_my_status(PurpleAccount* account);
-string get_my_ip();
+int generic_protocol_invite_contact(PurpleConversation* conv);
 
 //These are so scripts have a way to report back to the window from which they are invoked.
 //We need to store not only the PurpleConversation, but a record of what kind of window it is,

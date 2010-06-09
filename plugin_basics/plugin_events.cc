@@ -103,8 +103,8 @@ static gboolean writing_chat_msg(PurpleAccount *account, const char *who, char *
 
 static PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data)
 {
-  execute_command(conv,cmd,args,error,data);
-  return PURPLE_CMD_RET_OK;
+  int a = execute_command(conv,cmd,args,error,data);
+  return a ? a == 2 ? PURPLE_CMD_RET_FAILED : PURPLE_CMD_RET_OK : PURPLE_CMD_RET_CONTINUE;
 }
 
 

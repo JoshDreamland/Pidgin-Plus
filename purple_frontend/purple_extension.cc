@@ -49,34 +49,9 @@ void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg)
   purple_savedstatus_activate(nss);
 }
 
-
-string buddy_get_uname(PurpleAccount* account,string email)
+int generic_protocol_invite_contact(PurpleConversation* conv)
 {
-  PurpleBuddy *b = purple_find_buddy(account, email.c_str());
-  if (b == NULL)
-    return email;
-  const char* n = purple_buddy_get_server_alias(b);
-  return n? n : email;
-}
-string buddy_get_alias(PurpleAccount* account,string email)
-{
-  PurpleBuddy *b = purple_find_buddy(account, email.c_str());
-  const char *a = purple_buddy_get_contact_alias(b);
-  return a? a : email;
-}
-string buddy_get_status(PurpleAccount* account,string email)
-{
-  return "<insert buddy's status here ^_^>";
-}
-
-string get_my_name(PurpleAccount* account) {
-  return "LibPurple sucks.";
-}
-string get_my_email(PurpleAccount* account) {
-  return "I mean, LibPurple REALLY sucks.";
-}
-string get_my_status(PurpleAccount* account) {
-  return "I mean, LibPurple REALLY sucks.";
+  return false;
 }
 
 

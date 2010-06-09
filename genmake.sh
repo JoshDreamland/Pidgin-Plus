@@ -7,12 +7,10 @@ echo "# File consists of a lot of gobbledy followed by a target" >> Makefile;
 echo "" >> Makefile;
 
 echo "CFLAGS = \`pkg-config --cflags purple\`" >> Makefile;
-# echo "FLAGS = '-Wall -fPIC'" >> Makefile;
+echo "FLAGS = -Wall -fPIC" >> Makefile;
 echo "LIBS = \`pkg-config --libs purple\`" >> Makefile;
 echo "LINKS = './google_v8/v8-read-only/libv8.a'" >> Makefile
 echo "" >> Makefile;
-
-FLAGS='-Wall -fPIC'
 
 for subdir in ./*/ ./*/*/ ./; #Iterate 
   do
@@ -31,7 +29,7 @@ for subdir in ./*/ ./*/*/ ./; #Iterate
         echo "" >> Makefile;
         
         echo "	-mkdir .objs" >> Makefile;
-        echo "	\$(CXX) $FLAGS \$(CFLAGS) ${SYMBOL_FLAGS} ${OPTIMIZATION_FLAGS} -c  $file		-o .objs/${pathless%.cc}.o" >> Makefile;
+        echo "	\$(CXX) \$(FLAGS) \$(CFLAGS) ${SYMBOL_FLAGS} ${OPTIMIZATION_FLAGS} -c  $file		-o .objs/${pathless%.cc}.o" >> Makefile;
       };
       done;
     for file in $subdir*.c ;
@@ -49,7 +47,7 @@ for subdir in ./*/ ./*/*/ ./; #Iterate
         echo "" >> Makefile;
         
         echo "	-mkdir .objs" >> Makefile;
-        echo "	\$(CC) $FLAGS \$(CFLAGS) ${SYMBOL_FLAGS} ${OPTIMIZATION_FLAGS} -c  $file		-o .objs/${pathless%.c}.o"  >> Makefile;
+        echo "	\$(CC) \$(FLAGS) \$(CFLAGS) ${SYMBOL_FLAGS} ${OPTIMIZATION_FLAGS} -c  $file		-o .objs/${pathless%.c}.o"  >> Makefile;
       };
       done;
   done;

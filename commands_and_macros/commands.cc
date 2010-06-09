@@ -22,8 +22,8 @@
    @file commands.cc
    @summary This file breaks down the large list of Plus!
      commands into a few arrays; one containing the names,
-     one the help text for Pidgin, then an enum of their
-     IDs (each corresponding to an item in the first two
+     one the help text for Pidgin, some enum of their IDs
+     (which each correspond to an item from the first two
      arrays), and finally a function containing a switch
      statement to execute the appropriate one on call.
      
@@ -50,30 +50,32 @@ extern PurplePlugin *pidgin_plus_plugin;
 
 
 const char* command_string_msgplus[] = {
-  "addcontact","appearoffline","available","away", //4
+  "addcontact","appearoffline","available","away",            //4
   "block","blockgrp","brb","busy","close", "emails","invite", //7
-  "lock","lunch","msg", "noicon","online","onphone","page", //7
-  "phone", "ping","profile","sendfile","sendmail","signout", //6
-  "unblock","unblockgrp","video","voice" //4
+  "lock","lunch","msg", "noicon","online","onphone","page",   //7
+  "phone", "ping","profile","sendfile","sendmail","signout",  //6
+  "unblock","unblockgrp","video","voice"                      //4
 };
 
-#define CMDFLAG_BASIC PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
-#define CMDFLAG_NOCHAT PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
+#define CMDFLAG_BASIC     PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
+#define CMDFLAG_NOCHAT    PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS
 const int NUM_MSGPLUS_COMMANDS = sizeof(command_string_msgplus) / sizeof(char*);
 
 const char* command_description_msgplus[NUM_MSGPLUS_COMMANDS] = {
   "Add a new contact with given username/email (depending on protocol)","Set status to invisible on supported protocols",
       "Set status to available","Set status to a supported variant of away",
-  "Block the current user(s) in the conversation, or by name/email","Block an entire group by name",
+  "Block the current buddy(ies) in the conversation, or by name/email","Block an entire group by name",
       "Set status to 'Be right back' or an available equivalent","Set status to busy","Close the current conversation",
       "I'm not sure what /emails does","Invite a contact to this conversation",
-  "Lock pidgin, if the function is ever implemented","Set status to 'Out to Lunch' on old MSN protocol","No idea what /msg does",
+  "Lock pidgin, if the function is ever implemented","Set status to 'Out to Lunch' on the old MSN protocol","No idea what /msg does",
       "Remove smilies from outgoing messages on MSN Plus!","Set status to 'Available'","Set status to 'In a Call'","No idea.",
-  "Starts a phone call, I think","Ping your buddy, if he or she has Plus!","profile","sendfile","sendmail","signout",
-  "unblock","unblockgrp","video","voice"
+  "Starts a phone call, I think","Ping your buddy, if he or she has Plus!","profile","Send a file to this buddy, if the protocol allows",
+      "Send an email to this buddy, if an address is available","Sign out of Pidgin",
+  "Unblock the current buddy(ies) in the conversation, or by name/email","Unblock an entire group by name",
+      "This will pretty much never be implemented!","This will basically never be implemented!"
 };
 
-enum {
+enum { //This enum is to simplify that switch below.
   cmd_addcontact, cmd_appearoffline, cmd_available, cmd_away, 
   cmd_block, cmd_blockgrp, cmd_brb, cmd_busy, cmd_close, cmd_emails, cmd_invite, 
   cmd_lock, cmd_lunch, cmd_msg,  cmd_noicon, cmd_online, cmd_onphone, cmd_page, 
@@ -85,7 +87,7 @@ enum {
 
 PurpleCmdId COMMANDS_MSGPLUS[NUM_MSGPLUS_COMMANDS];
 
-bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *error, void *data)
+int execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *error, void *data)
 {
   string c = cmd;
   int jump_to_which = -1;
@@ -99,92 +101,90 @@ bool execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, g
     case -1: break;
     case cmd_addcontact:
         chaterror("Unimplemented.");
-      break;
+      return false;
     case cmd_appearoffline:
         all_accounts_set_status(PURPLE_STATUS_INVISIBLE,"");
-      break;
+      return true;
     case cmd_available:
         all_accounts_set_status(PURPLE_STATUS_AVAILABLE,"");
-      break;
+      return true;
     case cmd_away:
         all_accounts_set_status(PURPLE_STATUS_AWAY,"");
         all_accounts_set_status(PURPLE_STATUS_EXTENDED_AWAY,"");
-      break;
+      return true;
     case cmd_block:
         if (!purple_privacy_deny_add(conv->account, conv->name, false))
-          chaterror("Failed to block user. Sorry.");
-      break;
+          return 2;
+      return true;
     case cmd_blockgrp:
         chaterror("Not implemented: Working with groups in pidgin? Yikes.");
-      break;
+      return false;
     case cmd_brb:
         all_accounts_set_status(PURPLE_STATUS_AWAY,"");
-      break;
+      return true;
     case cmd_busy:
         all_accounts_set_status(PURPLE_STATUS_UNAVAILABLE,"");
-      break;
+      return true;
     case cmd_close:
-        //pidgin_conv_window_destroy(conv->win);
-        chaterror("Not implemented: Conv has no tie to Window");
-      break;
+        purple_conversation_destroy(conv);
+      return true;
     case cmd_emails:
         chaterror("Unimplemented: Iterating things in pidgin? Yikes.");
-      break;
+      return false;
     case cmd_invite:
-        chaterror("Unimplemented: Chats in pidgin? Impossible. Seriously, like two protocols support it. And only one's built-in. Forget it.");
-      break;
+      return generic_protocol_invite_contact(conv);
     case cmd_lock:
-        chaterror("Unimplemented: Pidgin lacks a lock function, and GTK sucks.");
-      break;
+        chaterror("Unimplemented: Pidgin lacks a lock mechanism, and GTK sucks.");
+      return false;
     case cmd_lunch:
         all_accounts_set_status(PURPLE_STATUS_EXTENDED_AWAY,"");
-      break;
+      return true;
     case cmd_msg:
         chaterror("Unimplemented: Dunno what this does.");
-      break;
+      return false;
     case cmd_noicon:
         //Prepend 0x08 to the outgoing message
-      break;
+      return false;
     case cmd_online:
         all_accounts_set_status(PURPLE_STATUS_AVAILABLE,"");
-      break;
+      return true;
     case cmd_onphone:
         all_accounts_set_status(PURPLE_STATUS_UNAVAILABLE,"On the phone");
-      break;
+      return true;
     case cmd_page:
         chaterror("What does this even do?");
-      break;
+      return false;
     case cmd_phone:
         chaterror("Not implemented. Are you KIDDING me?");
-      break;
+      return true;
     case cmd_ping:
         purple_conv_im_send(PURPLE_CONV_IM(conv), "Ping? [msgplus]");
-      break;
+      return true;
     case cmd_profile:
         
-      break;
+      return false;
     case cmd_sendfile:
         
-      break;
+      return false;
     case cmd_sendmail:
         
-      break;
+      return false;
     case cmd_signout:
         
-      break;
+      return false;
     case cmd_unblock:
         if (!purple_privacy_deny_remove(conv->account, conv->name, false))
-          chaterror("Failed to unblock user. Sorry.");
-      break;
+          return 2;
+      return true;
     case cmd_unblockgrp:
         
-      break;
+      return false;
     case cmd_video:
         
-      break;
+      return false;
     case cmd_voice:
         
-      break;
+      return false;
   }
   return false;
 }

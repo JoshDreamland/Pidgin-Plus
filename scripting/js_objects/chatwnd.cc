@@ -1,4 +1,3 @@
-
 /*
  * Pidgin Plus! Plugin
  *

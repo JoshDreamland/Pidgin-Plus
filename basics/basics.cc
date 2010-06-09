@@ -22,10 +22,10 @@
    @file basics.cc
    @summary This is a general-purpose file to be used
      throughout multiple headers. These are, again, a
-     method of simplifying code. Again, most functions
-     are self-explanatory. The exception is tostring_
-     time(), which is specifically designed for ping,
-     returning ????? when the input is negative.
+     method of simplifying code. Again, the functions
+     are mostly self-explanatory - with the exception
+     of tostring_time(), which was designed for ping,
+     and returns "?????" when the input is negative.
 */
 
 #include <string>
