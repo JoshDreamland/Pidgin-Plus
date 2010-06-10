@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h> // For some reason, explicit cast from void* to int is forbidden when void* is larger.
 
 #include <map>
 #include <string>
@@ -83,11 +84,11 @@ int plus_v8_end()
 }
 
 //Kill the running V8 thread if it's been going on too long
-int CALL_ID = 0;    
+intptr_t CALL_ID = 0;    
 gpointer kill_v8_if_it_takes_too_long(gpointer data)
 {
   usleep(1000000); //Unix only. Sorry Windows fans, go fuck yourselves.
-  if (CALL_ID == int(data))
+  if (CALL_ID == intptr_t(data))
     V8::TerminateExecution();
   return NULL;
 }

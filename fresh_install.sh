@@ -2,12 +2,20 @@
 # I have never successfully built Pidgin Plus! on Windows.
 # Technically, it should be possible, but this script is obviously for Linux, aptitude based.
 
-if $gname == "";
-  $gname = "apt-get";
+if test "$gname" == "";
+then
+  gname="apt-get";
+fi
 
-sudo $gname install svn
+sudo $gname install g++
+sudo $gname install subversion
 sudo $gname install python
 sudo $gname install scons
+sudo $gname build-dep pidgin
+sudo $gname install libpurple-dev
+sudo $gname install libc6-dev-i386
+
+export GCC_VERSION=44
 
 cd google_v8
 svn checkout http://v8.googlecode.com/svn/trunk/ v8-read-only
