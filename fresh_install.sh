@@ -17,12 +17,20 @@ sudo $gname install libc6-dev-i386
 
 export GCC_VERSION=44
 
+archspec=""
+if test `uname -m` == 'x86_64'
+then archspec="arch=x64"
+elif test `uname -m` == 'x64'
+then archspec="arch=x64"
+fi
+
 cd google_v8
 svn checkout http://v8.googlecode.com/svn/trunk/ v8-read-only
 cd v8-read-only
-scons mode=release library=shared snapshot=on
+scons mode=release library=static snapshot=on
 cd ../../
 
 make Release
+mkdir ~/.purple/plugins/
 mv pidgin_plus.so ~/.purple/plugins/pidgin_plus.so
 
