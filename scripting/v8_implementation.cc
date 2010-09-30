@@ -182,6 +182,7 @@ void ReportException(TryCatch* try_catch)
     const char* filename_string = ToCString(filename);
     int linenum = message->GetLineNumber();
     string eff = string(filename_string) + ", line " + tostring(linenum) + ": " + exception_string;
+    string effabbr = eff;
     // Print line of source code.
     String::Utf8Value sourceline(message->GetSourceLine());
     const char* sourceline_string = ToCString(sourceline);
@@ -193,6 +194,6 @@ void ReportException(TryCatch* try_catch)
     int end = message->GetEndColumn();
     for (int i = start; i < end; i++)
       eff += "^";
-    pidgin_printf(eff.c_str());
+    pidgin_printf(effabbr.c_str());
   }
 }

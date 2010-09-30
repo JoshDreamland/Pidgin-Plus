@@ -8,7 +8,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="bin/Release/libPidginPlus" prefix_auto="1" extension_auto="1" />
+				<Option output="pidgin_plus" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -52,9 +52,11 @@
 		<Unit filename="purple_frontend/purple_extension.h" />
 		<Unit filename="scripting/js_functions.cc" />
 		<Unit filename="scripting/js_functions.h" />
+		<Unit filename="scripting/js_objects/adder.cc" />
 		<Unit filename="scripting/js_objects/chatwnd.cc" />
 		<Unit filename="scripting/js_objects/js_objects_basics.cc" />
 		<Unit filename="scripting/js_objects/js_objects_basics.h" />
+		<Unit filename="scripting/js_objects/js_objects_manifest.h" />
 		<Unit filename="scripting/js_objects/msgplus.cc" />
 		<Unit filename="scripting/v8_implementation.cc" />
 		<Unit filename="scripting/v8_shared.cc" />

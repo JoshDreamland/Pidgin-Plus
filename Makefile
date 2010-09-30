@@ -30,7 +30,7 @@ LINKS = './google_v8/v8-read-only/libv8.a'
 .objs/purple_extension.o: ./purple_frontend/purple_extension.cc
 	-mkdir .objs
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./purple_frontend/purple_extension.cc		-o .objs/purple_extension.o
-.objs/js_functions.o: ./scripting/js_functions.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h
+.objs/js_functions.o: ./scripting/js_functions.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h scripting/js_functions.h scripting/js_objects/js_objects_basics.h
 	-mkdir .objs
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/js_functions.cc		-o .objs/js_functions.o
 .objs/v8_implementation.o: ./scripting/v8_implementation.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h scripting/js_functions.h
@@ -39,10 +39,13 @@ LINKS = './google_v8/v8-read-only/libv8.a'
 .objs/v8_shared.o: ./scripting/v8_shared.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h
 	-mkdir .objs
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/v8_shared.cc		-o .objs/v8_shared.o
+.objs/adder.o: ./scripting/js_objects/adder.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h scripting/js_objects/js_objects_basics.h
+	-mkdir .objs
+	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/js_objects/adder.cc		-o .objs/adder.o
 .objs/chatwnd.o: ./scripting/js_objects/chatwnd.cc scripting/js_objects/js_objects_basics.h scripting/v8_shared.h google_v8/v8-read-only/include/v8.h purple_frontend/purple_extension.h purple_frontend/personnel_info.h
 	-mkdir .objs
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/js_objects/chatwnd.cc		-o .objs/chatwnd.o
-.objs/js_objects_basics.o: ./scripting/js_objects/js_objects_basics.cc scripting/v8_shared.h google_v8/v8-read-only/include/v8.h
+.objs/js_objects_basics.o: ./scripting/js_objects/js_objects_basics.cc
 	-mkdir .objs
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/js_objects/js_objects_basics.cc		-o .objs/js_objects_basics.o
 .objs/msgplus.o: ./scripting/js_objects/msgplus.cc scripting/js_objects/js_objects_basics.h scripting/v8_shared.h google_v8/v8-read-only/include/v8.h
@@ -50,7 +53,7 @@ LINKS = './google_v8/v8-read-only/libv8.a'
 	$(CXX) $(FLAGS) $(CFLAGS)   -c  ./scripting/js_objects/msgplus.cc		-o .objs/msgplus.o
 
 # Nobody knows the trouble I've seen, no... no... nooo...
-link: .objs/basics.o .objs/commands.o .objs/macros.o .objs/date_time.o .objs/plugin_events.o .objs/plugin_template.o .objs/personnel_info.o .objs/purple_extension.o .objs/js_functions.o .objs/v8_implementation.o .objs/v8_shared.o .objs/chatwnd.o .objs/js_objects_basics.o .objs/msgplus.o
+link: .objs/basics.o .objs/commands.o .objs/macros.o .objs/date_time.o .objs/plugin_events.o .objs/plugin_template.o .objs/personnel_info.o .objs/purple_extension.o .objs/js_functions.o .objs/v8_implementation.o .objs/v8_shared.o .objs/adder.o .objs/chatwnd.o .objs/js_objects_basics.o .objs/msgplus.o
 	$(CXX) -shared -fPIC .objs/*.o $(LIBS) $(LINKS) -o pidgin_plus.so
 
 Release: link

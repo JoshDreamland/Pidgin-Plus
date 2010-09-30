@@ -17,6 +17,9 @@
  * along with this program; if not, see <www.gnu.org/licenses>
  *
  */
+ 
+#ifndef _V8_SHARED_H
+#define _V8_SHARED_H
 
 #include <string>
 using namespace std;
@@ -33,3 +36,5 @@ const char* ToCString(const String::Utf8Value&,const char* = "<string conversion
 extern HandleScope               handle_to_global_scope; //Nothingness scope
 extern Handle<ObjectTemplate>    global_object_template; //Containing global "this"
 extern Handle<Context>           global_context; //Global Context
+
+#endif

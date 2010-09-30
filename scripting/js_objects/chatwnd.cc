@@ -21,47 +21,38 @@
 #include "js_objects_basics.h"
 #include "../../purple_frontend/purple_extension.h"
 
+#define NAME ChatWnd
+
 extern int prints_remaining;
 
-struct ChatWnd
-{
-  Handle<ObjectTemplate> me;
-  
-  JavaScript:
-  
-      static Handle<Value> SendMessage(const Arguments& args)
+Begin_JavaScript_Functions
+//{
+    static Handle<Value> SendMessage(const Arguments& args)
+    {
+      for (int i = 0; i < args.Length(); i++)
       {
-        for (int i = 0; i < args.Length(); i++)
+        HandleScope handle_scope;
+        String::Utf8Value str(args[i]);
+        string cstr = ToCString(str);
+        if (cstr.length() > 512)
         {
-          HandleScope handle_scope;
-          String::Utf8Value str(args[i]);
-          string cstr = ToCString(str);
-          if (cstr.length() > 512)
-          {
-            cstr.erase(511);
-            cstr[508] = cstr[509] = cstr[510] = '.';
-          }
-          pidgin_printf(cstr.c_str());
-          if (prints_remaining-- <= 0)
-            return ThrowException(String::New("Too many messages sent in one script event"));
+          cstr.erase(511);
+          cstr[508] = cstr[509] = cstr[510] = '.';
         }
-        return Undefined();
+        pidgin_printf(cstr.c_str());
+        if (prints_remaining-- <= 0)
+          return ThrowException(String::New("Too many messages sent in one script event"));
       }
-  
-  Foundational:
-  
-  ChatWnd(): me(ObjectTemplate::New()) {
-    me->Set(String::New("SendMessage"), FunctionTemplate::New(SendMessage));
-  }
-} *inst_ChatWnd;
+      return Undefined();
+    }
+//}
+End_JavaScript_Functions
 
-void jso_init_chatwnd()
-{
-  delete inst_ChatWnd;
-  inst_ChatWnd = new ChatWnd;
-  object_add_to_global(inst_ChatWnd->me,"ChatWnd");
-}
-void jso_free_chatwnd()
-{
-  delete inst_ChatWnd;
-}
+Begin_Function_List
+   Add_Function(SendMessage, ChatWnd::SendMessage)
+End_Function_List
+
+Begin_Class_List
+End_Class_List
+
+Finalize_JavaScript_Class();

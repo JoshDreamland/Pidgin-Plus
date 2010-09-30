@@ -21,7 +21,9 @@
 #include "js_objects_basics.h"
 #include <stdlib.h>
 
-double vs_to_double(const char* x)
+#define NAME MsgPlus
+
+static double vs_to_double(const char* x)
 {
   bool rdot = 0;
   string s = x;
@@ -39,62 +41,44 @@ double vs_to_double(const char* x)
   return atof(s.c_str());
 }
 
-struct MsgPlus
-{
-  Handle<ObjectTemplate> me;
-  
-  JavaScript:
-    struct _version
-    {
-      Handle<ObjectTemplate> me;
-      
-      static Handle<Value> toString(const Arguments& args) {
-        return String::New("Pidgin Plus! Version 0.00.01");
-      }
-      static Handle<Value> valueOf (const Arguments& args) {
-        return Integer::New(5);
-      }
-      
-      _version(): me(ObjectTemplate::New()) {
-        me->Set(String::New("toString"), FunctionTemplate::New(toString) );
-        me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
-      }
-    } version;
+Begin_JavaScript_Functions
+//{
+    Begin_SubClass(version)
+        static Handle<Value> toString(const Arguments& args)  {
+          return String::New("Pidgin Plus! Version 0.00.01"); }
+        static Handle<Value> valueOf (const Arguments& args)  {
+          return Integer::New(5); }
+        
+        void construct () {
+          me->Set(String::New("toString"), FunctionTemplate::New(toString) );
+          me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
+        }
+    End_SubClass(version)
     
-    struct _v8version
-    {
-      Handle<ObjectTemplate> me;
-      
-      static Handle<Value> toString(const Arguments& args) {
-        return String::New((string("Google V8 version ") + V8::GetVersion()).c_str());
-      }
-      static Handle<Value> valueOf (const Arguments& args) {
-        return Number::New(vs_to_double(V8::GetVersion()));
-      }
-      
-      _v8version(): me(ObjectTemplate::New()) {
-        me->Set(String::New("toString"), FunctionTemplate::New(toString) );
-        me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
-      }
-    } v8_version;
-    
-  Foundational:
-  
-  MsgPlus(): me(ObjectTemplate::New()) {
-    me->Set(String::New("version"), version.me);
-    me->Set(String::New("js_version"), v8_version.me);
-    me->Set(String::New("javascript_version"), v8_version.me);
-    me->Set(String::New("jsVersion"), v8_version.me);
-  }
-} *inst_MsgPlus = NULL;
+    Begin_SubClass(v8version)
+        static Handle<Value> toString(const Arguments& args)  {
+          return String::New((string("Google V8 version ") + V8::GetVersion()).c_str()); }
+        static Handle<Value> valueOf (const Arguments& args)  {
+          return Number::New(vs_to_double(V8::GetVersion())); }
+        
+        void construct () {
+          me->Set(String::New("toString"), FunctionTemplate::New(toString) );
+          me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
+        }
+    End_SubClass(v8version)
+//}
+End_JavaScript_Functions
 
-void jso_init_msgplus()
-{
-  delete inst_MsgPlus;
-  inst_MsgPlus = new MsgPlus;
-  object_add_to_global(inst_MsgPlus->me,"MsgPlus");
-}
-void jso_free_msgplus()
-{
-  delete inst_MsgPlus;
-}
+Link_Class(MsgPlus, version);
+Link_Class(MsgPlus, v8version);
+
+Begin_Class_List
+  Add_Class(version,    MsgPlus::version)
+  Add_Class(v8version,  MsgPlus::v8version)
+  Add_Class(js_version, MsgPlus::v8version)
+End_Class_List
+
+Begin_Function_List
+End_Function_List
+
+Finalize_JavaScript_Class();

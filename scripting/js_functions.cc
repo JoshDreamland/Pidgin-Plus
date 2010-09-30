@@ -27,18 +27,68 @@
 */
 
 #include "v8_shared.h"
+#include "js_functions.h"
+#include "js_objects/js_objects_basics.h"
+#include "js_objects/js_objects_manifest.h"
+
+#include <stdio.h>
 
 int prints_remaining = 25;
 
-void jso_init_msgplus();
-void jso_free_msgplus();
-void jso_init_chatwnd();
-void jso_free_chatwnd();
+jsObject_basic::jsObject_basic(const char* n, jsFuncDesc* fs, jsClassDesc* cs): name(n), myFunctions(fs), myClasses(cs) { }
+void jsSubClass_basic::construct() { }
+
+
+void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
+  global_object_template->Set(String::New(name), obj);
+}
+
 
 void js_functions_initialize()
 {
-  jso_init_msgplus();
-  jso_init_chatwnd();
+  
+  // For every object that has registered itself
+  for (jsObject_basic **i = all_js_objects; *i; i++)
+  { // for each object as obj
+    FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+    fprintf(a,"Looking funny at %p::", i), fclose(a);
+    
+    jsObject_basic* obj = *i;
+    
+    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+    fprintf(a," %p\n", *i), fclose(a);
+    
+    // Create the object in V8's environment
+    obj->me = ObjectTemplate::New();
+    
+    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+    fprintf(a,"> Gave it a template\n"), fclose(a);
+    
+    // Add all its functions in
+    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+    fprintf(a,"Inspecting functions at %p\n", obj->myFunctions), fclose(a);
+    for (jsFuncDesc* f = obj->myFunctions; f->name and f->jsFunc; f++)
+    {
+      obj->me->Set(String::New(f->name), FunctionTemplate::New(f->jsFunc));
+      FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+      fprintf(a,"  Added object member %s::%s\n", obj->name,f->name), fclose(a);
+    }
+    
+    // Add all its classes in
+    for (jsClassDesc* c = obj->myClasses; c->name and c->jsSubClass; c++)
+    {
+      c->jsSubClass->me = ObjectTemplate::New();
+      obj->me->Set(String::New(c->name), c->jsSubClass->me);
+      FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+      fprintf(a,"  Added object member %s::%s\n", obj->name,c->name), fclose(a);
+      c->jsSubClass->construct();
+      a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+      fprintf(a,"  Instructed construct\n"), fclose(a);
+    }
+    object_add_to_global(obj->me, obj->name);
+    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
+    fprintf(a,"Added object %s\n", obj->name), fclose(a);
+  }
 }
 
 void js_resources_renew()
