@@ -70,22 +70,52 @@ string get_my_ip()
 //This will simplify the Purple-V8 bridge
 int conv_to_print_to_type;
 PurpleConversation* conv_to_print_to;
+string conv_protocol;
 enum { pct_im = 0, pct_chat = 1 };
 
 void set_receiving_window(PurpleConversation* conv, int window_type)
 {
   conv_to_print_to = conv;
   conv_to_print_to_type = window_type;
+  conv_protocol = conv->account->protocol_id;
 }
+inline int scountc(const char* s, char c)
+{
+  int cnt = 0;
+  for (const char *i = s; *i; i++)
+    cnt += *i == c;
+  return cnt;
+}
+
 void pidgin_printf(const char* message)
 {
   static int oncallstack = false;
   if (oncallstack) return;
   oncallstack = true;
-  switch (conv_to_print_to_type)
+  int lnc;
+  if ((conv_protocol != "prpl-irc" and conv_protocol != "irc") or (lnc = scountc(message, '\n')) < 5)
+    switch (conv_to_print_to_type)
+    {
+      case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
+      case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
+    }
+  else
   {
-    case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
-    case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
+    string msg = message; int sc = 1;
+    const float pkat_base = lnc / 4.0;
+    float pkat = pkat_base;
+    
+    for (size_t i = 0; i < msg.length(); i++) {
+      if (sc >= pkat and pkat+.1 < lnc) { if (msg[i] == '\n') pkat += pkat_base, sc++; continue; }
+      if (msg[i] == '\r') msg[i] = ' ';
+      if (msg[i] == '\n') msg.replace(i,1," /  "), sc++;
+    }
+    
+    switch (conv_to_print_to_type)
+    {
+      case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to),     msg.c_str()); break;
+      case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), msg.c_str()); break;
+    }
   }
   oncallstack = false;
 }
