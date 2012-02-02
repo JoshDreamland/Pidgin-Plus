@@ -33,7 +33,7 @@
 
 #include <stdio.h>
 
-int prints_remaining = 25;
+int prints_remaining = 5;
 
 jsObject_basic::jsObject_basic(const char* n, jsFuncDesc* fs, jsClassDesc* cs): name(n), myFunctions(fs), myClasses(cs) { }
 void jsSubClass_basic::construct() { }
@@ -93,5 +93,5 @@ void js_functions_initialize()
 
 void js_resources_renew()
 {
-  prints_remaining = 25;
+  prints_remaining = 5;
 }

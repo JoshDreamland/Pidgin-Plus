@@ -34,5 +34,5 @@ int generic_protocol_invite_contact(PurpleConversation* conv);
 //since there is somehow a distinguishing factor between conversations and IMs.
 //LibPurple may offer a method of determining this itself; the jury is still navigating the Doxygen Trac.
 void set_receiving_window(PurpleConversation* conv,int window_type); //Set the window that will receive script output
-void pidgin_printf(const char* message); //Print to the window in question.
+int pidgin_printf(const char* message); //Print to the window in question. Return lines printed.
 enum { pct_im = 0, pct_chat = 1 }; //Type of the window in question, or any window in question.

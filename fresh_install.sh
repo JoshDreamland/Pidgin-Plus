@@ -7,13 +7,18 @@ then
   gname="apt-get";
 fi
 
-sudo $gname install g++
-sudo $gname install subversion
-sudo $gname install python
-sudo $gname install scons
-sudo $gname build-dep pidgin
-sudo $gname install libpurple-dev
-sudo $gname install libc6-dev-i386
+if test "$gname" != "pacman";
+then
+  sudo $gname install g++
+  sudo $gname install subversion
+  sudo $gname install python
+  sudo $gname install scons
+  sudo $gname build-dep pidgin
+  sudo $gname install libpurple-dev
+  sudo $gname install libc6-dev-i386
+else
+  sudo pacman -Syu subversion python scons libpurple || exit
+fi
 
 export GCC_VERSION=44
 
@@ -27,7 +32,7 @@ fi
 cd google_v8
 svn checkout http://v8.googlecode.com/svn/trunk/ v8-read-only
 cd v8-read-only
-scons mode=release library=static snapshot=on
+scons mode=release library=static snapshot=on $archspec
 cd ../../
 
 make Release

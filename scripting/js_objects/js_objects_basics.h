@@ -21,6 +21,7 @@
 #include <vector>
 using namespace std;
 #include "../v8_shared.h"
+#include "glib-2.0/glib.h"
 
 struct jsFuncDesc
 {

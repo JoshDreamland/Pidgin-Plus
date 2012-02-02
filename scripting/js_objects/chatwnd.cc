@@ -39,8 +39,9 @@ Begin_JavaScript_Functions
           cstr.erase(511);
           cstr[508] = cstr[509] = cstr[510] = '.';
         }
-        pidgin_printf(cstr.c_str());
-        if (prints_remaining-- <= 0)
+	int linesprinted = pidgin_printf(cstr.c_str());
+        prints_remaining -= linesprinted ? linesprinted : 1;
+        if (prints_remaining <= 0)
           return ThrowException(String::New("Too many messages sent in one script event"));
       }
       return Undefined();

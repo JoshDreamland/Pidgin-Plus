@@ -87,18 +87,22 @@ inline int scountc(const char* s, char c)
   return cnt;
 }
 
-void pidgin_printf(const char* message)
+int pidgin_printf(const char* message)
 {
   static int oncallstack = false;
-  if (oncallstack) return;
+  if (oncallstack) return 0;
   oncallstack = true;
-  int lnc;
-  if ((conv_protocol != "prpl-irc" and conv_protocol != "irc") or (lnc = scountc(message, '\n')) < 5)
+  int lnc = 0;
+  int retpc = 1;
+  if ((conv_protocol != "prpl-irc" and conv_protocol != "irc") or (lnc = scountc(message, '\n')) < 4)
+  {
     switch (conv_to_print_to_type)
     {
       case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
       case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
     }
+    retpc += lnc;
+  }
   else
   {
     string msg = message; int sc = 1;
@@ -106,9 +110,9 @@ void pidgin_printf(const char* message)
     float pkat = pkat_base;
     
     for (size_t i = 0; i < msg.length(); i++) {
-      if (sc >= pkat and pkat+.1 < lnc) { if (msg[i] == '\n') pkat += pkat_base, sc++; continue; }
+      if (sc >= pkat and pkat+.1 < lnc) { if (msg[i] == '\n') pkat += pkat_base, sc++, retpc++; continue; }
       if (msg[i] == '\r') msg[i] = ' ';
-      if (msg[i] == '\n') msg.replace(i,1," /  "), sc++;
+      if (msg[i] == '\n') msg.replace(i,1," /  "), sc++, retpc++;
     }
     
     switch (conv_to_print_to_type)
@@ -118,5 +122,6 @@ void pidgin_printf(const char* message)
     }
   }
   oncallstack = false;
+  return retpc;
 }
 

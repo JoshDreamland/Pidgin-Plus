@@ -31,7 +31,7 @@
 
 #include <map>
 #include <string>
-#include <glib/glib.h>
+#include <glib-2.0/glib.h>
 using namespace std;
 
 //Assuming those who want to compile this have 
