@@ -42,6 +42,8 @@
 #include <string>
 using namespace std;
 
+#include "purple_extension.h"
+
 void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg)
 {
   PurpleSavedStatus* nss = purple_savedstatus_new(NULL, pstat); 
@@ -49,8 +51,9 @@ void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg)
   purple_savedstatus_activate(nss);
 }
 
-int generic_protocol_invite_contact(PurpleConversation* conv)
+int generic_protocol_invite_contact(PurpleConversation*)
 {
+  // FIXME: This function is never going to fucking work.
   return false;
 }
 
@@ -71,7 +74,6 @@ string get_my_ip()
 int conv_to_print_to_type;
 PurpleConversation* conv_to_print_to;
 string conv_protocol;
-enum { pct_im = 0, pct_chat = 1 };
 
 void set_receiving_window(PurpleConversation* conv, int window_type)
 {
@@ -100,6 +102,7 @@ int pidgin_printf(const char* message)
     {
       case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
       case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
+      default: return 1000;
     }
     retpc += lnc;
   }
@@ -119,6 +122,7 @@ int pidgin_printf(const char* message)
     {
       case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to),     msg.c_str()); break;
       case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), msg.c_str()); break;
+      default: return 1000;
     }
   }
   oncallstack = false;

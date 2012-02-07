@@ -18,32 +18,39 @@
  *
  */
  
- /**
-   @file basics.cc
-   @summary This is a general-purpose file to be used
-     throughout multiple headers. These are, again, a
-     method of simplifying code. Again, the functions
-     are mostly self-explanatory - with the exception
-     of tostring_time(), which was designed for ping,
-     and returns "?????" when the input is negative.
+/**
+  @file  basics.cc
+  @brief Source implementing basic utility functions.
+  
+  This is a general-purpose file to be used throughout multiple headers.
+  These are, again, a method of simplifying code. The functions are, for
+  the most part, self-explanatory, with the exception of tostring_time(),
+  which was designed specifically for the ping command.
 */
 
 #include <string>
 #include <stdio.h>
 using namespace std;
 
+#include "basics.h"
+
+/// Return a string representation of a floating point number.
 string tostring(long double x)
 {
   static char retc[24];
   sprintf(retc,"%Lf",x);
   return retc;
 }
+/// Return a string representation of an integer.
 string tostring(int x)
 {
   static char retc[24];
   sprintf(retc,"%d",x);
   return retc;
 }
+/// Return a string representation of a time, in seconds.
+/// @param x  The time to represent.
+/// @return A string representation of \p x, or five question marks ("?????") if x is less than zero.
 string tostring_time(long double x)
 {
   if (x < 0) return "?????";

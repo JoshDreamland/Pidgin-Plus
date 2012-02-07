@@ -19,13 +19,14 @@
  */
 
 /**
-  @file plugin_events.cc
-  @summary This file makes calls to more complicated functions
-    when a relevant event is invoked in Pidgin, such as when a
-    message is sent or received. This file also contains code
-    to register all the purple events and Plus! functions with
-    Pidgin so the plugin can work. Those two functions can be
-    found at the bottom, and are called in plugin_template.cc.
+  @file  plugin_events.cc
+  @brief File for handling event firing.
+  
+  This file makes calls to more complicated functions when a relevant event
+  is invoked in Pidgin, such as when a message is sent or received. This file
+  also contains code to register all the purple events with Pidgin so the plugin
+  can work. Those two functions can be found at the bottom, and are called in
+  plugin_template.cc.
 */
 
 #include <notify.h>
@@ -41,12 +42,13 @@
 #include "../commands_and_macros/commands.h"
 #include "../purple_frontend/purple_extension.h"
 
+#include "plugin_events.h"
 
-/*
-    Handle simple events
-*/
+//=================================================================================================
+//===- Handle simple events -======================================================================
+//=================================================================================================
 
-void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
+static void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
 {
   if (filter_outgoing(true,pct_im,account,receiver,message))
   {
@@ -55,13 +57,19 @@ void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
   }
 }
 
+/// This callback is invoked upon actually printing a message to the window of a one-on-one IM conversation.
+/// @param account  The account from which the message is being sent.
+/// @param who      The name of the recipient of the message.
+/// @param message  The contents of the message, as a pointer to a string. This is to allow the message to be modified.
+/// @param conv     The PurpleConversation of the IM to which the message is being sent.
+/// @param flags    The purple flags affiliated with this message. These are all but completely irrelevant to us.
 static gboolean writing_im_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
 {
   return filter_outgoing(false,pct_im,account,who,message,conv,flags);
 }
 
 
-void sending_chat_msg(PurpleAccount *account, char **message, int id)
+static void sending_chat_msg(PurpleAccount *account, char **message, int id)
 {
   PurpleConversation* c = purple_find_chat (purple_account_get_connection(account), id);
   PurpleConvChat* cc = purple_conversation_get_chat_data(c);
@@ -81,7 +89,7 @@ void sending_chat_msg(PurpleAccount *account, char **message, int id)
 }
 
 #define msgbox(STRHERE) purple_notify_message (pidgin_plus_plugin, PURPLE_NOTIFY_MSG_INFO, "Info", STRHERE, NULL, NULL, NULL)
-static gboolean writing_chat_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
+static gboolean writing_chat_msg(PurpleAccount *account, const char *, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
 {
   PurpleConvChat* cc = purple_conversation_get_chat_data(conv);
   GList* u = purple_conv_chat_get_users(cc);
@@ -101,7 +109,7 @@ static gboolean writing_chat_msg(PurpleAccount *account, const char *who, char *
     Handle Plus!'s large array of commands
 */
 
-static PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data)
+PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data)
 {
   int a = execute_command(conv,cmd,args,error,data);
   return a ? a == 2 ? PURPLE_CMD_RET_FAILED : PURPLE_CMD_RET_OK : PURPLE_CMD_RET_CONTINUE;
@@ -126,20 +134,4 @@ void plus_events_disconnect_signals(PurplePlugin * plugin)
   purple_signal_disconnect(purple_conversations_get_handle(), "sending-im-msg",   plugin, PURPLE_CALLBACK(sending_im_msg));
   purple_signal_disconnect(purple_conversations_get_handle(), "sending-chat-msg", plugin, PURPLE_CALLBACK(sending_chat_msg));
   purple_signal_disconnect(purple_conversations_get_handle(), "writing-chat-msg", plugin, PURPLE_CALLBACK(writing_chat_msg));
-}
-
-
-void plus_commands_register()
-{
-  for (int i = 0; i < NUM_MSGPLUS_COMMANDS; i++)
-  {
-    //printf("%d of %d: 0x%8X and 0x%8X\r\n",i,NUM_MSGPLUS_COMMANDS,(unsigned)command_string_msgplus[i],(unsigned)command_description_msgplus[i]);
-    COMMANDS_MSGPLUS[i] = purple_cmd_register(command_string_msgplus[i], "w", PURPLE_CMD_P_PLUGIN,(PurpleCmdFlag)(PURPLE_CMD_FLAG_IM | PURPLE_CMD_FLAG_CHAT | PURPLE_CMD_FLAG_ALLOW_WRONG_ARGS),	
-                         NULL, PURPLE_CMD_FUNC(slash_command_handler), command_description_msgplus[i], NULL);
-  }
-}
-void plus_commands_free()
-{
-  for (int i=0; i<NUM_MSGPLUS_COMMANDS; i++)
-    purple_cmd_unregister(COMMANDS_MSGPLUS[i]);
 }

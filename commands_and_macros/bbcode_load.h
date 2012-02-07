@@ -1,4 +1,9 @@
-/*
+/**
+ * @file plugin_template.cc
+ * 
+ * This file is the catch-it-allfor BBCode tag initializers. Its sole
+ * purpose is to make up for C++'s lack of static code.
+ *
  * Pidgin Plus! Plugin
  *
  * Copyright (C) 2009 Josh Ventura
@@ -15,9 +20,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
+*/
 
-extern PurpleCmdId COMMANDS_MSGPLUS[];
-
-int execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *error, void *data);
+extern void load_bb_formatting();
+static void load_bbcode() {
+  load_bb_formatting();
+}

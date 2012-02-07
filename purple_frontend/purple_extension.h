@@ -29,10 +29,13 @@ void all_accounts_set_status(PurpleStatusPrimitive pstat,const string& msg); //D
 
 int generic_protocol_invite_contact(PurpleConversation* conv);
 
-//These are so scripts have a way to report back to the window from which they are invoked.
-//We need to store not only the PurpleConversation, but a record of what kind of window it is,
-//since there is somehow a distinguishing factor between conversations and IMs.
-//LibPurple may offer a method of determining this itself; the jury is still navigating the Doxygen Trac.
-void set_receiving_window(PurpleConversation* conv,int window_type); //Set the window that will receive script output
-int pidgin_printf(const char* message); //Print to the window in question. Return lines printed.
-enum { pct_im = 0, pct_chat = 1 }; //Type of the window in question, or any window in question.
+// These are so scripts have a way to report back to the window from which they are invoked.
+// We need to store not only the PurpleConversation, but a record of what kind of window it is,
+// since there is somehow a distinguishing factor between conversations and IMs.
+// LibPurple may offer a method of determining this itself; the jury is still navigating the Doxygen Trac.
+void set_receiving_window(PurpleConversation* conv,int window_type); ///< Set the window that will receive script output.
+int pidgin_printf(const char* message); ///< Print to the window specified in the last call to \c set_receiving_window. Return lines printed.
+enum { pct_im = 0, pct_chat = 1 }; ///< Type of the window in question, or any window in question.
+
+/// Test the protocol used by a given conversation for a match to the given string
+bool conversation_protocol_match(PurpleConversation* conv,const char* str);

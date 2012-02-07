@@ -39,8 +39,8 @@ jsObject_basic::jsObject_basic(const char* n, jsFuncDesc* fs, jsClassDesc* cs): 
 void jsSubClass_basic::construct() { }
 
 
-void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
-  global_object_template->Set(String::New(name), obj);
+static void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
+  plus_v8_global->object_template->Set(String::New(name), obj);
 }
 
 
@@ -51,12 +51,12 @@ void js_functions_initialize()
   for (jsObject_basic **i = all_js_objects; *i; i++)
   { // for each object as obj
     FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"Looking funny at %p::", i), fclose(a);
+    fprintf(a,"Looking funny at %p::", (void*)i), fclose(a);
     
     jsObject_basic* obj = *i;
     
     a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a," %p\n", *i), fclose(a);
+    fprintf(a," %p\n", (void*)*i), fclose(a);
     
     // Create the object in V8's environment
     obj->me = ObjectTemplate::New();
@@ -66,24 +66,16 @@ void js_functions_initialize()
     
     // Add all its functions in
     a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"Inspecting functions at %p\n", obj->myFunctions), fclose(a);
+    fprintf(a,"Inspecting functions at %p\n", (void*)obj->myFunctions), fclose(a);
     for (jsFuncDesc* f = obj->myFunctions; f->name and f->jsFunc; f++)
-    {
       obj->me->Set(String::New(f->name), FunctionTemplate::New(f->jsFunc));
-      FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-      fprintf(a,"  Added object member %s::%s\n", obj->name,f->name), fclose(a);
-    }
     
     // Add all its classes in
     for (jsClassDesc* c = obj->myClasses; c->name and c->jsSubClass; c++)
     {
       c->jsSubClass->me = ObjectTemplate::New();
       obj->me->Set(String::New(c->name), c->jsSubClass->me);
-      FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-      fprintf(a,"  Added object member %s::%s\n", obj->name,c->name), fclose(a);
       c->jsSubClass->construct();
-      a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-      fprintf(a,"  Instructed construct\n"), fclose(a);
     }
     object_add_to_global(obj->me, obj->name);
     a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");

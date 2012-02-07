@@ -1,4 +1,11 @@
-/*
+/**
+ * @file plugin_template.cc
+ * 
+ * This file is almost entirely syntactical doodoo to make happy 
+ * the connection between the plugin and pidgin. The goal is to have as
+ * little original code in this file as possible so it can be discarded
+ * as a waste heap. Comments were left to help the curious navigate.
+ *
  * Pidgin Plus! Plugin
  *
  * Copyright (C) 2009 Josh Ventura
@@ -15,20 +22,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
-
-/**
-  @file plugin_template.cc
-  @summary This file is almost entirely syntactical doodoo to make happy 
-    the connection between the plugin and pidgin. The goal is to have as
-    little original code in this file as possible so it can be discarded
-    as a waste heap. Comments were left to help the curious navigate.
 */
 
-/*
-   Some includes
-*/
+//=============================================================================================
+//==- Some includes ===========================================================================
+//=============================================================================================
+
     #ifdef HAVE_CONFIG_H
     # include <config.h>
     #endif
@@ -51,45 +50,43 @@
     # endif
     #endif
 
-/*
-   This file's few actual dependencies
-*/
-    #include <notify.h>
-    #include <plugin.h>
-    #include <version.h>
+
+//=============================================================================================
+//==- This file's few actual dependencies -====================================================
+//=============================================================================================
+
+#include <notify.h>
+#include <plugin.h>
+#include <version.h>
+#include <scripting/v8_implementation.h>
+#include "plugin_events.h"
+#include <commands_and_macros/bbcode_load.h>
 
 
-/*
-   This is where the real code is
-*/
-  #include "plugin_events.h"
 
-/*
-   This doesn't mean anything.
-*/
-  // we're adding this here and assigning it in plugin_load because we need
-  // a valid plugin handle for our call to purple_notify_message() in the
-  // plugin_action_test_cb() callback function */
-  PurplePlugin *pidgin_plus_plugin = NULL;
+//=============================================================================================
+//==- This is where the real code is -=========================================================
+//=============================================================================================
 
-  // we tell libpurple in the PurplePluginInfo struct to call this function to
-  // get a list of plugin actions to use for the plugin.  This function gives
-  // libpurple that list of actions. */
-  
-/*
-   This is a list of plugin actions from the demo plugin. It is no longer in use.
-*/
-static GList *plugin_actions (PurplePlugin * plugin, gpointer context)
+// we're adding this here and assigning it in plugin_load because we need
+// a valid plugin handle for our call to purple_notify_message() in the
+// plugin_action_test_cb() callback function */
+PurplePlugin *pidgin_plus_plugin = NULL;
+
+static void cb_pplus_prefs(PurplePluginAction *)
 {
-  /* // This is to be used when Plus! supports enough to justify it
+  // We presently don't have any preferences to show.
+}
+
+// We tell libpurple in the PurplePluginInfo struct to call this function to get a list of
+// plugin actions to use for the plugin. This function gives libpurple that list of actions.
+static GList *plugin_actions (PurplePlugin *, gpointer)
+{
+  // This is to be used when Plus! supports enough to justify it
   GList *list = NULL;
-  PurplePluginAction *action = NULL;
-  
-  action = purple_plugin_action_new ("Plugin Action Test", plugin_action_test_cb);
+  PurplePluginAction *action = purple_plugin_action_new ("Pidgin Plus! Preferences", cb_pplus_prefs);
   list = g_list_append (list, action);
-  */
-  
-  return NULL;
+  return list;
 }
 
 
@@ -97,20 +94,26 @@ static GList *plugin_actions (PurplePlugin * plugin, gpointer context)
    Make calls to files that matter.
    I told you this file was a waste heap.
 */
-int plus_v8_end();
-int plus_v8_init();
 static gboolean plugin_load (PurplePlugin * plugin)
 {
+  puts("Store handle"); fflush(stdout);
   pidgin_plus_plugin = plugin;   //Assign this here so we have a valid handle later
+  puts("Connect signals");
   plus_events_connect_signals(plugin); //Tell Pidgin what events we'll be calling. See plugin_events.cc in this directory.
+  puts("Register commands signals");
   plus_commands_register();      //Gain control of Plus!'s commands
+  puts("Load BBCode tags");
+  load_bbcode();
   
+  puts("Start threads");
   //Implement threading for JS
   if (!g_thread_get_initialized())
     g_thread_init(NULL);
   
+  puts("Start V8");
   //Initialize V8
   plus_v8_init();
+  puts("DONE. Relinquish control to Pidgin.");
   return TRUE;
 }
 
@@ -146,7 +149,7 @@ static PurplePluginInfo info = {
 };
 
 //This would do something if anything in this plugin could be loaded and unloaded without freeing global memory <_<"
-static void init_plugin (PurplePlugin *plugin) { }
+static void init_plugin (PurplePlugin *) { }
 
 //C++ gives the whole process gas. 
 //Before you go making fun of C++, consider that V8 Operates in it.

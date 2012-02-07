@@ -1,4 +1,8 @@
-/*
+/**
+ * @file v8_implementation.h
+ * 
+ * Declares functions for initializing and working with V8.
+ *
  * Pidgin Plus! Plugin
  *
  * Copyright (C) 2009 Josh Ventura
@@ -15,9 +19,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
+*/
 
-extern PurpleCmdId COMMANDS_MSGPLUS[];
+// V8 Management Functions
+int plus_v8_init();
+int plus_v8_end();
+int plus_v8_wipe();
 
-int execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *error, void *data);
+// Script Functions
+int plus_evaluate_js_line(const char* line);

@@ -44,9 +44,9 @@ static double vs_to_double(const char* x)
 Begin_JavaScript_Functions
 //{
     Begin_SubClass(version)
-        static Handle<Value> toString(const Arguments& args)  {
+        static Handle<Value> toString(const Arguments&)  {
           return String::New("Pidgin Plus! Version 0.00.01"); }
-        static Handle<Value> valueOf (const Arguments& args)  {
+        static Handle<Value> valueOf (const Arguments&)  {
           return Integer::New(5); }
         
         void construct () {
@@ -56,9 +56,9 @@ Begin_JavaScript_Functions
     End_SubClass(version)
     
     Begin_SubClass(v8version)
-        static Handle<Value> toString(const Arguments& args)  {
+        static Handle<Value> toString(const Arguments&)  {
           return String::New((string("Google V8 version ") + V8::GetVersion()).c_str()); }
-        static Handle<Value> valueOf (const Arguments& args)  {
+        static Handle<Value> valueOf (const Arguments&)  {
           return Number::New(vs_to_double(V8::GetVersion())); }
         
         void construct () {
@@ -69,8 +69,8 @@ Begin_JavaScript_Functions
 //}
 End_JavaScript_Functions
 
-Link_Class(MsgPlus, version);
-Link_Class(MsgPlus, v8version);
+Link_Class(MsgPlus, version)
+Link_Class(MsgPlus, v8version)
 
 Begin_Class_List
   Add_Class(version,    MsgPlus::version)

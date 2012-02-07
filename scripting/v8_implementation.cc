@@ -1,5 +1,12 @@
-/*
- * Pidgin Plus! Plugin
+/**
+ * @file  v8_implementations.cc
+ * @brief Implement functions for interfacing with Google V8.
+ * 
+ * This file is another unoriginal waste heap, for
+ * the most part. It handles most of the initialization of
+ * Google V8. The rest is done implicitly in v8_shared.cc
+ *
+ * @section License
  *
  * Copyright (C) 2009 Josh Ventura
  *
@@ -16,14 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
  *
- */
-
-/**
-  @file v8_implementations.cc
-  @summary This file is another unoriginal waste heap, for
-    the most part. It handles most of the initialization of
-    Google V8. The rest is done implicitly in v8_shared.cc
-*/
+**/
 
 #include <string.h>
 #include <stdlib.h>
@@ -44,20 +44,21 @@ extern void pidgin_printf(const char*);
 
 //Include the file that actually does things
 #include "js_functions.h"
-
+#include "v8_implementation.h"
 
 map <string, PPlus_Script> scripts;
 
 //Functions
-  bool          ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions);
-  void          ReportException(TryCatch* handler);
-  Handle<Value> Print(const Arguments& args);
+static bool          ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions);
+static void          ReportException(TryCatch* handler);
+//static Handle<Value> Print(const Arguments& args);
 
 
 int plus_v8_init()
 {
+  plus_v8_global = new plus_v8_instance();
   js_functions_initialize(); // see javascript_functions.cc
-  global_context = Context::New(NULL, global_object_template);
+  plus_v8_global->context = Context::New(NULL, plus_v8_global->object_template);
   return 0;
 }
 
@@ -76,16 +77,15 @@ int plus_evaluate_js_line(const char* line)
   return 0;
 }
 
-//If V8 is unloaded here, attempts to 
-//reenable it will result in segfault
-int plus_v8_end()
-{
+int plus_v8_end() {
+  // If V8 is unloaded here, any attempt to reenable it will result in segfault
   return 0;
 }
 
-//Kill the running V8 thread if it's been going on too long
-intptr_t CALL_ID = 0;    
-gpointer kill_v8_if_it_takes_too_long(gpointer data)
+intptr_t CALL_ID = 0;
+
+/// Static callback to kill the running V8 thread if it's been open for too long.
+static gpointer kill_v8_if_it_takes_too_long(gpointer data)
 {
   usleep(1000000); //Unix only. Sorry Windows fans, go fuck yourselves.
   if (CALL_ID == intptr_t(data))
@@ -96,16 +96,15 @@ gpointer kill_v8_if_it_takes_too_long(gpointer data)
 //Until the pidgin devs bother to only load plugins when 
 //they are enabled, the V8 engine will remain in memory.
 
-//This can be called when a device to destroy a plugin
-//Is not only implemented, but actually effing used.
-int plus_v8_wipe()
-{
+/// Destroy the V8 context, permanently.
+/// This can be called when some device to destroy a pidgin plugin is not only implemented, but actually used.
+int plus_v8_wipe() {
   V8::Dispose();
   return 0;
 }
 
 //Returns true if successful
-bool load_script(Handle<String> source, string name)
+static bool load_script(Handle<String> source, string name)
 {
   Handle<Script> scr = Script::Compile(source, String::New(name.c_str()));
   if (scr.IsEmpty())
@@ -117,7 +116,7 @@ bool load_script(Handle<String> source, string name)
 bool ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions)
 {
   TryCatch try_catch;
-  Context::Scope scope(global_context);
+  Context::Scope scope(plus_v8_global->context);
   
   //Renew "limited" script resources
   js_resources_renew(); //Like time, and number of print() calls

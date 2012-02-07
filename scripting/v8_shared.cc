@@ -26,13 +26,9 @@
  */
  
 #include "v8_shared.h"
+plus_v8_instance::plus_v8_instance(): scope(), object_template(ObjectTemplate::New()), context() {}
+plus_v8_instance *plus_v8_global;
 
-// This block of declarations CANNOT BE REORDERED. 
-// Each one has a complicated-ASS private constructor.
-// Rearranging or removing these declarations could cause V8 to not work.
-HandleScope               handle_to_global_scope; //Global scope
-Handle<ObjectTemplate>    global_object_template = ObjectTemplate::New(); //Containing global "this"
-Handle<Context>           global_context; //Global Context
 
 // These are just convenient
 const char* ToCString(const String::Utf8Value& value,const char* ifnull){

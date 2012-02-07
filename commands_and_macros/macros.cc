@@ -1,6 +1,13 @@
-/*
- * Pidgin Plus! Plugin
- *
+/**
+ * @file macros.cc
+ * @brief Source implementing handlers for text replacement. 
+ * 
+ * In Pidgin Plus!, "macro" refers to any segment of message that will be replaced with
+ * more text later. These include (!N), which is replaced with the name (if available)
+ * of the other contact(s) in the chat. Because text replacement accounts for the 
+ * majority of the reason we bother having events at this point, filter_outgoing is
+ * also defined in this file.Pidgin Plus! Plugin
+ * 
  * Copyright (C) 2009 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or
@@ -15,18 +22,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
- 
- /**
-   @file macros.cc
-   @summary In Pidgin Plus!, "macro" refers to any segment
-     of message that will be replaced by more text later.
-     These include (!N), which is replaced with the name
-     (if available) of the other contact(s) in the chat.
-     Because text replacement accounts for the majority of
-     the reason we bother having events at this point,
-     filter_outgoing is also defined in this file.
  */
 
 #include <notify.h>
@@ -38,6 +33,8 @@
 #include <savedstatuses.h>
 #include <conversation.h>
 
+#include <compatibility/codes.h>
+#include <scripting/v8_implementation.h>
 
 extern PurplePlugin *pidgin_plus_plugin;
 #define msgbox(STRHERE) purple_notify_message (pidgin_plus_plugin, PURPLE_NOTIFY_MSG_INFO, "Info", STRHERE, NULL, NULL, NULL)
@@ -47,41 +44,22 @@ extern PurplePlugin *pidgin_plus_plugin;
 
 #include <map>
 #include <string>
+#include <vector>
 using namespace std;
 
-#include "../gtk_etc_frontend/date_time.h"        //Fetch date/time info
-#include "../gtk_etc_frontend/gtk_timer_struct.h" //Ping timing
-#include "../purple_frontend/purple_extension.h"  //Simplify
-
-#include "../basics/basics.h"
-
-bool command_interpret(string m,unsigned int p,PurpleAccount *account)
-{ 
-  unsigned int cs = p;
-  for (p++; is_letterd(m[p]); p++);
-  string c = m.substr(cs+1,p-cs-1);
-  
-  while (m[p] == ' ') p++; //Move to end of spaces following /away... but keep tabs and newlines
-  
-  if (c == "all")
-  {
-    m.erase(cs,p-cs);
-    GList* conv = purple_get_conversations();
-    for (; conv != NULL; conv = conv->next)
-      purple_conv_im_send (PURPLE_CONV_IM((PurpleConversation*)conv->data),m.c_str());
-    return true;
-  }
-  
-  msgbox(("Unknown function "+c+".").c_str());
-  return true;
-}
+#include <gtk_etc_frontend/date_time.h>        //Fetch date/time info
+#include <gtk_etc_frontend/gtk_timer_struct.h> //Ping timing
+#include <purple_frontend/purple_extension.h>  //Simplify
+#include <basics/basics.h>
+#include "bbcode_iface.h"
+#include "macros.h"
 
 map<string,timestack> conv_pingclocks;
 
-int d=0;
-const char * hexa = "0123456789ABCDEF";
+// int d=0;
+// static const char * hexa = "0123456789ABCDEF";
 
-unsigned skip_html(string m, unsigned p)
+static unsigned skip_html(string m, unsigned p)
 {
   while (m[p] == '<')
     while (m[p] and m[p++] != '>')
@@ -90,22 +68,27 @@ unsigned skip_html(string m, unsigned p)
   return p;
 }
 
-extern int plus_evaluate_js_line(const char* line);
-bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv = NULL, PurpleMessageFlags flags = PURPLE_MESSAGE_SEND)
+struct opentaginfo {
+  string name, arg;
+  int tag_start_pos, tag_end_pos;
+  opentaginfo(string n,string a,int sp,int ep): name(n), arg(a), tag_start_pos(sp), tag_end_pos(ep) {}
+};
+
+bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv, PurpleMessageFlags flags)
 {
-  string m = *message;
+  string msg = *message;
   string rs = receiver;
   
-  for (unsigned int p = 0; p < m.length(); p++)
+  for (unsigned int p = 0; p < msg.length(); p++)
   {
-    p = skip_html(m,p);
-    if (m[p] == '(' and m[p+1] == '!')
+    p = skip_html(msg,p);
+    if (msg[p] == '(' and msg[p+1] == '!')
     {
       const unsigned int pstart = p++;
-      while (is_letter(m[++p]));
-      if (m[p] == ')')
+      while (is_letter(msg[++p]));
+      if (msg[p] == ')')
       {
-        string c = m.substr(pstart+2,p-pstart-2);
+        string c = msg.substr(pstart+2,p-pstart-2);
         if (c != "")
         {
           bool r=0;
@@ -148,7 +131,7 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
           
           if (r)
           {
-            m.replace(pstart, p-pstart+1,rw);
+            msg.replace(pstart, p-pstart+1,rw);
             p += rw.length() - (p - pstart);
             continue;
           }
@@ -161,26 +144,16 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
   
   //navigate to end of HTML garbage
   unsigned int p = 0;
-  while (m[p] == '<')
-    while (m[p] and m[p++] != '>') 
-      if (m[p]=='"') while (m[++p] and m[p] != '"') if (m[p]=='\\') p++;
-      else if (m[p]=='\'') while (m[++p] and m[p] != '\'') if (m[p]=='\\') p++;
+  while (msg[p] == '<')
+    while (msg[p] and msg[p++] != '>') 
+      if (msg[p]=='"') while (msg[++p] and msg[p] != '"') if (msg[p]=='\\') p++;
+      else if (msg[p]=='\'') while (msg[++p] and msg[p] != '\'') if (msg[p]=='\\') p++;
   
   bool req_auto_reply = 0;
   
-  if (m[p] == '/')
+  if (msg[p] != '/')
   {
-    if (m[p+1] == '/')
-        m.erase(p,1);
-    else if (me_sending)
-    {
-      if (command_interpret(m,p,account))
-        return true;
-    }
-  }
-  else 
-  {
-    char* cm = purple_markup_strip_html(m.c_str());
+    char* cm = purple_markup_strip_html(msg.c_str());
     if (!strcmp(cm,"Ping? [msgplus]")) //Someone's sending a ping request
     {
       req_auto_reply = 1;
@@ -188,7 +161,7 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
       {
         if ((flags & PURPLE_MESSAGE_RECV) and conv != NULL)
           purple_conv_im_send (PURPLE_CONV_IM(conv), "\x5\x3\x33Pong! [     ]");
-        m = "<font color = \"#00C000\"><i>Ping? [request]</i></color>";
+        msg = "<font color = \"#00C000\"><i>Ping? [request]</i></color>";
       }
       else conv_pingclocks[receiver].pushtime();
     }
@@ -196,9 +169,9 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
     {
       req_auto_reply = 1;
       map<string,timestack>::iterator ps = conv_pingclocks.find(receiver);
-      if (ps == conv_pingclocks.end()) m = "<font color = \"#00C000\"><i>Pong! [???]</i></color>";
+      if (ps == conv_pingclocks.end()) msg = "<font color = \"#00C000\"><i>Pong! [???]</i></color>";
       else
-      m = (flags & PURPLE_MESSAGE_RECV) ?
+      msg = (flags & PURPLE_MESSAGE_RECV) ?
       "<font color = \"#00C000\"><i>Pong! [" + tostring_time(ps->second.popwithreturn()) + "]</i></color>" : "<font color = \"#00C000\"><i>Pong! [resps]</i></color>";
     }
     else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':') //Handle "JS:" as a temporary hax
@@ -210,53 +183,38 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
     g_free(cm);
   }
   
-  if (!req_auto_reply)
+  if (!req_auto_reply && !me_sending) // If this isn't an automatic response to /ping or the like, and it's not being sent to the network
   {
-    if (!me_sending) //This is local, being written to our chat window
-    {
-      bool bold=0,ital=0,undr=0;
-      int lbold=-1, lital=-1, lundr=-1;
-      for (unsigned int i=0; i < m.length(); i++)
+    puts("Handle BBCode");
+    // Handle BBCode
+    size_t pos, indx = 0; vector< opentaginfo > open_tags;
+    for (bbiter it = bbcode_tags.begin(); it != bbcode_tags.end(); it++)
+      it->second->init(); // Initialize the map of bbcode tags.
+    bbcode_tag::instance tag;
+    for (pos = 0; pos < msg.length(); pos++) {
+      if (bbcode_tag::at(msg.c_str(),pos,tag))
       {
-        if (m[i] == 0x02)
-            m.replace(i,m.substr(i+1,3) == "x2;" ? 4:1, (bold = !bold) ? "<b>":"</b>");
-        else if (m[i] == 0x05)
-            m.replace(i,m.substr(i+1,3) == "x5;" ? 4:1, (ital = !ital) ? "<i>":"</i>");
-        else if (m[i] == 0x1f)
-            m.replace(i,m.substr(i+1,4) == "x1f;" ? 5:1, (undr = !undr) ? "<u>":"</u>");
-        else if (i < m.length() - 3)
-        {
-          if (lpos(m.substr(i,3),1) == "[b]")
-            lbold = i;
-          else if (lbold != -1 and lpos(m.substr(i,4),2) == "[/b]")
-          {
-            m.replace(lbold, 3, bold ? "" : "<b>"), bold=1;
-            m.replace(i, 4, !bold ? "":"</b>"), bold=0;
-            lbold = -1;
+        if (tag.unary) continue;
+        if (tag.closing) {
+          printf("Identified closing [/%s].\n",tag.name.c_str());
+          for (int i = indx; i >= 0; i--)
+          if (open_tags[i].name == tag.name) {
+            printf("Found matching [%s]. Replacing...\n",tag.name.c_str());
+            string content(msg,open_tags[i].tag_end_pos+1, pos-open_tags[i].tag_end_pos-1);
+            string rep = bbcode_tags[open_tags[i].name]->get_replacement(conv,account,content,open_tags[i].arg);
+            msg.replace(open_tags[i].tag_start_pos,pos + tag.length - open_tags[i].tag_start_pos,rep);
+            break;
           }
-          else if (lpos(m.substr(i,3),1) == "[i]")
-            lital = i;
-          else if (lital != -1 and lpos(m.substr(i,4),2) == "[/i]")
-          {
-            m.replace(lital, 3, ital ? "" : "<i>"), ital=1;
-            m.replace(i, 4, !ital ? "":"</i>"), ital=0;
-            lital = -1;
-          }
-          else if (lpos(m.substr(i,3),1) == "[u]")
-            lundr = i;
-          else if (lundr != -1 and lpos(m.substr(i,4),2) == "[/u]")
-          {
-            m.replace(lundr, 3, undr ? "" : "<u>"), undr=1;
-            m.replace(i, 4, !undr ? "":"</u>"), undr=0;
-            lundr = -1;
-          }
+          continue;
         }
+        printf("Identified opening [%s].\n",tag.name.c_str());
+        open_tags.push_back(opentaginfo(tag.name,tag.arg,pos,pos+tag.length-1));
       }
     }
   }
   
   g_free(*message);
-  *message = g_new(char,m.length() + 1);
-  memcpy(*message, m.c_str(), m.length() + 1);
+  *message = g_new(char,msg.length() + 1);
+  memcpy(*message, msg.c_str(), msg.length() + 1);
   return false;
 }

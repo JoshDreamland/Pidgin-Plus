@@ -1,1 +1,21 @@
-Pidgin Plus! is a free-software project intended to make Pidgin more comfortable across multiple protocols by unifying commands as done in Messenger Plus! for Windows Messenger.
+Pidgin Plus! is a free-software project intended to make Pidgin more comfortable across multiple
+protocols by unifying commands as done in Messenger Plus! for Windows Messenger.
+
+Pidgin Plus! incorporates a JavaScript based scripting system powered by Google V8, in order to
+promote simpler plugin authoring. At the moment, this functionality is experimental. You can try
+it out by prefixing messages with "js:" (the remainder of the message will be executed by V8 as
+JavaScript).
+
+The following commands are introduced for all protocols:
+/appearoffline - Sets the status to "Invisible."
+/available - Sets the status to "Available." Same as /online.
+/away - Sets the status to "Away," or "Extended away" on some protocols.
+/block - Attempt to block someone. Pidgin's blocks are buggy; use with caution.
+/blockgrp - Block an entire group by name. Just don't use this.
+/close - Close the current conversation window.
+/invite - TBI. Will create a chat from the current conversation and invite the requested user.
+/noicon - Prevents emoticons in messages. Only for MSN protocol.
+/online - Sets the status to "Available." Same as /available.
+/onphone - Sets the status to "Busy." This is from an old MSN Plus! version.
+/say - Sends a message, in the current window, as yourself. Not very useful.
+/signout - Disconnect from all protocols.

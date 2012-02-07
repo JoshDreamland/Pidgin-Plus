@@ -77,4 +77,4 @@ struct jsSubClass_basic
 
 #define Finalize_JavaScript_Class() _w_fin_class(NAME)
 #define _w_fin_class(n)  _w_fin_class1(n)
-#define _w_fin_class1(n) n::n(): jsObject_basic(#n, n##_Funcs, n##_Classes) {}; jsObject_basic* jsob_##n = &_inst_##n
+#define _w_fin_class1(n) n::n(): jsObject_basic(#n, n##_Funcs, n##_Classes) {} jsObject_basic* jsob_##n = &_inst_##n

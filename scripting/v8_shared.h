@@ -33,8 +33,14 @@ using namespace v8;
 string ValueToStr(Handle<Value>);
 const char* ToCString(const String::Utf8Value&,const char* = "<string conversion failed>");
 
-extern HandleScope               handle_to_global_scope; //Nothingness scope
-extern Handle<ObjectTemplate>    global_object_template; //Containing global "this"
-extern Handle<Context>           global_context; //Global Context
+extern struct plus_v8_instance {
+  // This block of declarations CANNOT BE REORDERED. 
+  // Each one has a complicated-ASS private constructor.
+  // Rearranging or removing these declarations could cause V8 to not work.
+  HandleScope               scope; //Global scope
+  Handle<ObjectTemplate>    object_template; //Containing global "this"
+  Handle<Context>           context; //Global Context
+  plus_v8_instance();
+} *plus_v8_global;
 
 #endif
