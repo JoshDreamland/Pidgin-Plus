@@ -3,7 +3,7 @@
 bbcode_tag::bbcode_tag(string name, bool is_unary): unary(is_unary) { bbcode_tags[name] = this; }
 bbcode_tag::~bbcode_tag() { }
 
-string bbcode_tag::get_replacement(PurpleConversation*, PurpleAccount*, string, string) { return "Internal error: invalid tag."; }
+string bbcode_tag::get_replacement(PurpleConversation*, PurpleAccount*, string, string, string) { return "Internal error: invalid tag."; }
 string bbcode_tag::get_unary_replacement(PurpleConversation*, PurpleAccount*, string) { return "Internal error: invalid tag."; }
 
 bbmap bbcode_tags;

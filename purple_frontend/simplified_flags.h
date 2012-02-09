@@ -1,4 +1,9 @@
-/*
+/**
+ * @file   simplified_flags.h
+ * @brief  Purple's message flag system is unhelpful. This provides an alternative.
+ * 
+ * @section License
+ * 
  * Pidgin Plus! Plugin
  *
  * Copyright (C) 2009 Josh Ventura
@@ -15,8 +20,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
+**/
 
-#include "purple_frontend/simplified_flags.h"
-bool filter_message(int mflags, int window_type, PurpleAccount *account, const char *recipient,char **message,PurpleConversation *conv = NULL);
+enum {
+  MSG_MINE = 1,    ///< Set if the message was sent by us. Otherwise, it is from our partner.
+  MSG_WRITING = 2, ///< Set if this message is to be written to the chat. Otherwise, it is being processed before send.
+  MSG_CHAT = 4     ///< Set if the message originated in a chat window. Otherwise, it originated in an IM window.
+};

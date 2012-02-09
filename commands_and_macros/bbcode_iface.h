@@ -20,7 +20,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
 **/
 
 #include <map>
@@ -42,9 +41,10 @@ struct bbcode_tag {
       @param account  The account from which the tag is being handled, for differentiating behavior by protocol.
       @param content  The text enclosed between the start and end tag.
       @param arg      The argument specified to the tag by means of [tagname=arg], or an empty string if no argument was given.
+      @param arg2     The argument specified to the end tag by means of [/tagname=arg], or an empty string if no second argument was given.
       @return Returns the string with which to replace \p content.
   **/
-  virtual string get_replacement(PurpleConversation *conv, PurpleAccount *account, string content, string arg = "");
+  virtual string get_replacement(PurpleConversation *conv, PurpleAccount *account, string content, string arg = "", string arg2 = "");
   /** Called when the tag is encountered for tags with a start and end.
       @param conv     The conversation in which the tag is being handled.
       @param account  The account from which the tag is being handled, for differentiating behavior by protocol.

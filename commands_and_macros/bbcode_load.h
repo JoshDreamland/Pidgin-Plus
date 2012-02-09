@@ -23,6 +23,8 @@
 */
 
 extern void load_bb_formatting();
+void load_bb_unicode();
 static void load_bbcode() {
   load_bb_formatting();
+  load_bb_unicode();
 }

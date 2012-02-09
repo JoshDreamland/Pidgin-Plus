@@ -50,7 +50,7 @@
 
 static void sending_im_msg(PurpleAccount *account, const char *receiver,char **message)
 {
-  if (filter_outgoing(true,pct_im,account,receiver,message))
+  if (filter_message(MSG_MINE,pct_im,account,receiver,message))
   {
     g_free(*message);
     *message = NULL;
@@ -65,7 +65,7 @@ static void sending_im_msg(PurpleAccount *account, const char *receiver,char **m
 /// @param flags    The purple flags affiliated with this message. These are all but completely irrelevant to us.
 static gboolean writing_im_msg(PurpleAccount *account, const char *who, char **message, PurpleConversation *conv, PurpleMessageFlags flags)
 {
-  return filter_outgoing(false,pct_im,account,who,message,conv,flags);
+  return filter_message((flags&PURPLE_MESSAGE_SEND)? MSG_WRITING|MSG_MINE : MSG_WRITING,pct_im,account,who,message,conv);
 }
 
 
@@ -81,7 +81,7 @@ static void sending_chat_msg(PurpleAccount *account, char **message, int id)
     usernames += ", ";
   }
   
-  if (filter_outgoing(true,pct_chat,account,usernames.c_str(),message))
+  if (filter_message(MSG_MINE|MSG_CHAT,pct_chat,account,usernames.c_str(),message))
   {
     g_free(*message);
     *message = NULL;
@@ -99,7 +99,7 @@ static gboolean writing_chat_msg(PurpleAccount *account, const char *, char **me
     usernames += purple_conv_chat_cb_get_name((PurpleConvChatBuddy*)u->data);
     usernames += ", ";
   }
-  return filter_outgoing(false,pct_chat,account,usernames.c_str(),message,conv,flags);
+  return filter_message((flags&PURPLE_MESSAGE_SEND)? MSG_WRITING|MSG_CHAT|MSG_MINE : MSG_WRITING|MSG_CHAT,pct_chat,account,usernames.c_str(),message,conv);
 }
 
 

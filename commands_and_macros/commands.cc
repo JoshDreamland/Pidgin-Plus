@@ -126,6 +126,8 @@ int execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gc
           string msg; for (gchar** i = args; *i; i++) msg += *i;
           for (GList* allconvs = purple_get_conversations(); allconvs != NULL; allconvs = allconvs->next)
             purple_conv_im_send (PURPLE_CONV_IM((PurpleConversation*)allconvs->data),msg.c_str()); 
+          for (GList* allconvs = purple_get_chats(); allconvs != NULL; allconvs = allconvs->next)
+            purple_conv_chat_send (PURPLE_CONV_CHAT((PurpleConversation*)allconvs->data),msg.c_str()); 
         }
       return true;
     case cmd_appearoffline:

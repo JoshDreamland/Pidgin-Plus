@@ -20,29 +20,28 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
 **/
 
 #include "bbcode_iface.h"
 
 /// Struct defining the bold tag, [b].
 struct boldtag: bbcode_tag {
-  void init() { vars["bold"] = vars["boldstart"] = 0; }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string) { return "<b>" + content + "</b>"; }
+  void init() { }
+  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) { return "<b>" + content + "</b>"; }
   boldtag(): bbcode_tag("b",false) {}
 };
 
 /// Struct defining the bold tag, [i].
 struct italictag: bbcode_tag {
-  void init() { vars["ital"] = 0; }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string) { return "<i>" + content + "</i>"; }
+  void init() { }
+  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) { return "<i>" + content + "</i>"; }
   italictag(): bbcode_tag("i",false) {}
 };
 
 /// Struct defining the bold tag, [u].
 struct underlinetag: bbcode_tag {
-  void init() { vars["undr"] = 0; }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string) { return "<u>" + content + "</u>"; }
+  void init() { }
+  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) { return "<u>" + content + "</u>"; }
   underlinetag(): bbcode_tag("u",false) {}
 };
 

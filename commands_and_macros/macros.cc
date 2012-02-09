@@ -74,10 +74,10 @@ struct opentaginfo {
   opentaginfo(string n,string a,int sp,int ep): name(n), arg(a), tag_start_pos(sp), tag_end_pos(ep) {}
 };
 
-bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, const char *receiver,char **message,PurpleConversation *conv, PurpleMessageFlags flags)
+bool filter_message(int mflags, int window_type, PurpleAccount *account, const char *recipient,char **message,PurpleConversation *conv)
 {
   string msg = *message;
-  string rs = receiver;
+  string rs = recipient;
   
   for (unsigned int p = 0; p < msg.length(); p++)
   {
@@ -157,22 +157,22 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
     if (!strcmp(cm,"Ping? [msgplus]")) //Someone's sending a ping request
     {
       req_auto_reply = 1;
-      if (!me_sending)
+      if (~mflags & MSG_WRITING) // If we're not processing this message for send
       {
-        if ((flags & PURPLE_MESSAGE_RECV) and conv != NULL)
+        if (not(mflags & (MSG_WRITING|MSG_MINE|MSG_CHAT)) and conv) // If we're receiving this message from someone else, not in a chat
           purple_conv_im_send (PURPLE_CONV_IM(conv), "\x5\x3\x33Pong! [     ]");
         msg = "<font color = \"#00C000\"><i>Ping? [request]</i></color>";
       }
-      else conv_pingclocks[receiver].pushtime();
+      else conv_pingclocks[recipient].pushtime();
     }
-    else if ((!strcmp(cm,"\x5\x3\x33Pong! [     ]") or !strcmp(cm,"\5x5;\3x3;3Pong! [     ]")) and !me_sending) //Got a pong that isn't being sent
+    else if ((!strcmp(cm,"\x5\x3\x33Pong! [     ]") or !strcmp(cm,"\5x5;\3x3;3Pong! [     ]")) and (mflags & MSG_WRITING)) // Writing a pong from somewhere
     {
       req_auto_reply = 1;
-      map<string,timestack>::iterator ps = conv_pingclocks.find(receiver);
+      map<string,timestack>::iterator ps = conv_pingclocks.find(recipient);
       if (ps == conv_pingclocks.end()) msg = "<font color = \"#00C000\"><i>Pong! [???]</i></color>";
       else
-      msg = (flags & PURPLE_MESSAGE_RECV) ?
-      "<font color = \"#00C000\"><i>Pong! [" + tostring_time(ps->second.popwithreturn()) + "]</i></color>" : "<font color = \"#00C000\"><i>Pong! [resps]</i></color>";
+      msg = (mflags & MSG_MINE) ? "<font color = \"#00C000\"><i>Pong! [resps]</i></color>" :
+      "<font color = \"#00C000\"><i>Pong! [" + tostring_time(ps->second.popwithreturn()) + "]</i></color>";
     }
     else if(cm[0] == 'j' and cm[1] == 's' and cm[2] == ':') //Handle "JS:" as a temporary hax
       if (conv != NULL)
@@ -183,11 +183,11 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
     g_free(cm);
   }
   
-  if (!req_auto_reply && !me_sending) // If this isn't an automatic response to /ping or the like, and it's not being sent to the network
+  if (!req_auto_reply) // If this isn't an automatic response to /ping or the like
   {
     puts("Handle BBCode");
     // Handle BBCode
-    size_t pos, indx = 0; vector< opentaginfo > open_tags;
+    size_t pos; vector< opentaginfo > open_tags; int indx = 0;
     for (bbiter it = bbcode_tags.begin(); it != bbcode_tags.end(); it++)
       it->second->init(); // Initialize the map of bbcode tags.
     bbcode_tag::instance tag;
@@ -197,24 +197,41 @@ bool filter_outgoing(bool me_sending, int window_type, PurpleAccount *account, c
         if (tag.unary) continue;
         if (tag.closing) {
           printf("Identified closing [/%s].\n",tag.name.c_str());
-          for (int i = indx; i >= 0; i--)
-          if (open_tags[i].name == tag.name) {
-            printf("Found matching [%s]. Replacing...\n",tag.name.c_str());
-            string content(msg,open_tags[i].tag_end_pos+1, pos-open_tags[i].tag_end_pos-1);
-            string rep = bbcode_tags[open_tags[i].name]->get_replacement(conv,account,content,open_tags[i].arg);
-            msg.replace(open_tags[i].tag_start_pos,pos + tag.length - open_tags[i].tag_start_pos,rep);
-            break;
-          }
+          for (int i = indx-1; i >= 0; i--)
+            if (open_tags[i].name == tag.name) {
+              printf("Found matching [%s]. Replacing...\n",tag.name.c_str());
+              string content(msg,open_tags[i].tag_end_pos+1, pos-open_tags[i].tag_end_pos-1);
+              string rep = tag.tag->get_replacement(conv,account,content,open_tags[i].arg,tag.arg);
+              msg.replace(open_tags[i].tag_start_pos,pos + tag.length - open_tags[i].tag_start_pos,rep);
+              if (i < indx-1)
+                pos = open_tags[i].tag_start_pos;
+              else
+                pos += rep.length() - (pos + tag.length - open_tags[i].tag_start_pos) - 1;
+              indx--;
+              for (int j = i; j < indx; j++)
+                open_tags[j] = open_tags[j+1];
+              open_tags.pop_back();
+              break;
+            } else printf("The next open tag is [%s], not [%s]...\n",open_tags[i].name.c_str(),tag.name.c_str());
           continue;
         }
         printf("Identified opening [%s].\n",tag.name.c_str());
+        indx++;
         open_tags.push_back(opentaginfo(tag.name,tag.arg,pos,pos+tag.length-1));
+      }
+    }
+    for (pos = 0; pos < msg.length(); pos++) {
+      if (bbcode_tag::at(msg.c_str(),pos,tag)) {
+        if (!tag.unary) continue;
+        string rep = tag.tag->get_unary_replacement(conv,account,tag.arg);
+        msg.replace(pos,tag.length,rep);
       }
     }
   }
   
   g_free(*message);
-  *message = g_new(char,msg.length() + 1);
-  memcpy(*message, msg.c_str(), msg.length() + 1);
+  const char *src = msg.c_str();
+  *message = g_new(char,msg.length() + (*src != '/'));
+  memcpy(*message, src + (*src == '/'), msg.length() + (*src != '/'));
   return false;
 }

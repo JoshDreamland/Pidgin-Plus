@@ -46,27 +46,15 @@ static void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
 
 void js_functions_initialize()
 {
-  
   // For every object that has registered itself
   for (jsObject_basic **i = all_js_objects; *i; i++)
   { // for each object as obj
-    FILE *a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"Looking funny at %p::", (void*)i), fclose(a);
-    
     jsObject_basic* obj = *i;
-    
-    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a," %p\n", (void*)*i), fclose(a);
     
     // Create the object in V8's environment
     obj->me = ObjectTemplate::New();
     
-    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"> Gave it a template\n"), fclose(a);
-    
     // Add all its functions in
-    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"Inspecting functions at %p\n", (void*)obj->myFunctions), fclose(a);
     for (jsFuncDesc* f = obj->myFunctions; f->name and f->jsFunc; f++)
       obj->me->Set(String::New(f->name), FunctionTemplate::New(f->jsFunc));
     
@@ -78,8 +66,6 @@ void js_functions_initialize()
       c->jsSubClass->construct();
     }
     object_add_to_global(obj->me, obj->name);
-    a = fopen("/home/josh/Desktop/pidginplus_dbg.txt","ab");
-    fprintf(a,"Added object %s\n", obj->name), fclose(a);
   }
 }
 

@@ -4,3 +4,4 @@
 
 google_v8/v8-read-only/
 
+*.so
