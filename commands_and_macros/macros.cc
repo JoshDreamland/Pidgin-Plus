@@ -201,7 +201,7 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
             if (open_tags[i].name == tag.name) {
               printf("Found matching [%s]. Replacing...\n",tag.name.c_str());
               string content(msg,open_tags[i].tag_end_pos+1, pos-open_tags[i].tag_end_pos-1);
-              string rep = tag.tag->get_replacement(conv,account,content,open_tags[i].arg,tag.arg);
+              string rep = tag.tag->get_replacement(conv,account,mflags,content,open_tags[i].arg,tag.arg);
               msg.replace(open_tags[i].tag_start_pos,pos + tag.length - open_tags[i].tag_start_pos,rep);
               if (i < indx-1)
                 pos = open_tags[i].tag_start_pos;
@@ -223,7 +223,7 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
     for (pos = 0; pos < msg.length(); pos++) {
       if (bbcode_tag::at(msg.c_str(),pos,tag)) {
         if (!tag.unary) continue;
-        string rep = tag.tag->get_unary_replacement(conv,account,tag.arg);
+        string rep = tag.tag->get_unary_replacement(conv,account,mflags,tag.arg);
         msg.replace(pos,tag.length,rep);
       }
     }
@@ -231,7 +231,7 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
   
   g_free(*message);
   const char *src = msg.c_str();
-  *message = g_new(char,msg.length() + (*src != '/'));
-  memcpy(*message, src + (*src == '/'), msg.length() + (*src != '/'));
+  *message = g_new(char,msg.length() + not(*src == '/' and (mflags & MSG_MINE)));
+  memcpy(*message, src + (*src == '/' and (mflags & MSG_MINE)), msg.length() + not(*src == '/' and (mflags & MSG_MINE)));
   return false;
 }

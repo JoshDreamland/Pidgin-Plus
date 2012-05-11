@@ -38,6 +38,8 @@ extern const char* unicode_script;
 extern const char* unicode_serifbold;
 extern const char* unicode_serifitalic;
 extern const char* unicode_serifbolditalic;
+extern const char* unicode_braille;
+extern const char* unicode_circled;
 
 extern const string msgplus_bold;
 extern const string msgplus_italic;

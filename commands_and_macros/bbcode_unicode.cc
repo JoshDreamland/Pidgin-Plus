@@ -52,7 +52,7 @@ static void realphabet(string& str, const char* alphabet) {
 /// Struct defining the unicode sans-serif bold tag, [ub].
 struct unicode_bold_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_sansbold);
     return content;
   }
@@ -62,7 +62,7 @@ struct unicode_bold_tag: bbcode_tag {
 /// Struct defining the unicode sans-serif italics tag, [ui].
 struct unicode_italic_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_sansitalic);
     return content;
   }
@@ -72,7 +72,7 @@ struct unicode_italic_tag: bbcode_tag {
 /// Struct defining the unicode sans-serif bold italics tag, [ubi].
 struct unicode_bold_italic_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_sansbolditalic);
     return content;
   }
@@ -82,7 +82,7 @@ struct unicode_bold_italic_tag: bbcode_tag {
 /// Struct defining the unicode serif bold tag, [usb].
 struct unicode_serif_bold_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_serifbold);
     return content;
   }
@@ -92,7 +92,7 @@ struct unicode_serif_bold_tag: bbcode_tag {
 /// Struct defining the unicode serif italics tag, [usi].
 struct unicode_serif_italic_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_serifitalic);
     return content;
   }
@@ -102,7 +102,7 @@ struct unicode_serif_italic_tag: bbcode_tag {
 /// Struct defining the unicode serif bold-italics tag, [usbi].
 struct unicode_serif_bold_italic_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_serifbolditalic);
     return content;
   }
@@ -112,7 +112,7 @@ struct unicode_serif_bold_italic_tag: bbcode_tag {
 /// Struct defining the unicode double-strike tag, [ds].
 struct unicode_doublestrike_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_doublestrike);
     return content;
   }
@@ -122,7 +122,7 @@ struct unicode_doublestrike_tag: bbcode_tag {
 /// Struct defining the unicode frakture tag, [frak].
 struct unicode_fraktur_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_fraktur);
     return content;
   }
@@ -132,7 +132,7 @@ struct unicode_fraktur_tag: bbcode_tag {
 /// Struct defining the unicode script tag, [script].
 struct unicode_script_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_script);
     return content;
   }
@@ -142,11 +142,31 @@ struct unicode_script_tag: bbcode_tag {
 /// Struct defining the unicode monospace tag, [mono].
 struct unicode_mono_tag: bbcode_tag {
   void init() { }
-  string get_replacement(PurpleConversation*, PurpleAccount*, string content, string, string) {
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
     realphabet(content, unicode_monospace);
     return content;
   }
   unicode_mono_tag(): bbcode_tag("mono",false) {}
+};
+
+/// Struct defining the unicode braille tag, [braille].
+struct unicode_braille_tag: bbcode_tag {
+  void init() { }
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
+    realphabet(content, unicode_braille);
+    return content;
+  }
+  unicode_braille_tag(string name = "braille"): bbcode_tag(name,false) {}
+};
+
+/// Struct defining the unicode circled letters tag, [circle].
+struct unicode_circle_tag: bbcode_tag {
+  void init() { }
+  string get_replacement(PurpleConversation*, PurpleAccount*, int, string content, string, string) {
+    realphabet(content, unicode_circled);
+    return content;
+  }
+  unicode_circle_tag(string name = "circle"): bbcode_tag(name,false) {}
 };
 
 
@@ -162,4 +182,8 @@ void load_bb_unicode() {
   new unicode_fraktur_tag;
   new unicode_script_tag;
   new unicode_mono_tag;
+  new unicode_braille_tag;
+  new unicode_braille_tag("brail");
+  new unicode_circle_tag;
+  new unicode_circle_tag("circ");
 }

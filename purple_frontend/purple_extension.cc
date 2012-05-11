@@ -89,6 +89,22 @@ inline int scountc(const char* s, char c)
   return cnt;
 }
 
+inline int scountln(const char* s)
+{
+  int cnt = 0;
+  for (const char *i = s; *i; i++)
+    cnt += *i == '\n' or (*i == '\r' and i[1] != '\n');
+  return cnt;
+}
+
+static string strip_commands(string msg) {
+  const char* uc; // Skip whitespace--get first non-white char
+  for (uc = msg.c_str(); *uc and g_unichar_isspace(g_utf8_get_char(uc)); uc = g_utf8_next_char(uc));
+  if (*uc == '!' or *uc == '@' or *uc == '$')
+    return *uc + msg;
+  return msg;
+}
+
 int pidgin_printf(const char* message)
 {
   static int oncallstack = false;
@@ -96,27 +112,58 @@ int pidgin_printf(const char* message)
   oncallstack = true;
   int lnc = 0;
   int retpc = 1;
-  if ((conv_protocol != "prpl-irc" and conv_protocol != "irc") or (lnc = scountc(message, '\n')) < 4)
+  if ((conv_protocol != "prpl-irc" and conv_protocol != "irc") or (lnc = scountln(message)) < 4)
   {
     switch (conv_to_print_to_type)
     {
       case pct_im:   purple_conv_im_send (PURPLE_CONV_IM(conv_to_print_to), message);     break;
-      case pct_chat: purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message); break;
+      case pct_chat: 
+        if (conv_protocol == "prpl-irc" or conv_protocol == "irc") {
+          string dmsg(message), msg;
+          msg.reserve(dmsg.length() + 8);
+          size_t nlp, nlps = 0;
+          do {
+            nlp = dmsg.find_first_of("\r\n", nlps);
+            if (nlp == string::npos)
+              msg += strip_commands(dmsg.substr(nlps));
+            else {
+              msg += strip_commands(dmsg.substr(nlps, nlp - nlps)); msg += '\n';
+              for (nlps = nlp+1; dmsg[nlps] == '\r' or dmsg[nlps] == '\n'; ++nlps);
+            }
+          } while (nlp != string::npos);
+          purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), msg.c_str());
+          break;
+        }
+        purple_conv_chat_send (PURPLE_CONV_CHAT(conv_to_print_to), message);
+      break;
       default: return 1000;
     }
     retpc += lnc;
   }
   else
   {
-    string msg = message; int sc = 1;
+    string msg, dmsg = message; int sc = 1;
     const float pkat_base = lnc / 4.0;
     float pkat = pkat_base;
+    size_t start = 0;
     
-    for (size_t i = 0; i < msg.length(); i++) {
-      if (sc >= pkat and pkat+.1 < lnc) { if (msg[i] == '\n') pkat += pkat_base, sc++, retpc++; continue; }
-      if (msg[i] == '\r') msg[i] = ' ';
-      if (msg[i] == '\n') msg.replace(i,1," /  "), sc++, retpc++;
+    
+    for (size_t i = 0; i < dmsg.length(); i++) {
+      if (sc >= pkat and pkat+.1 < lnc) {
+        if (dmsg[i] == '\n' or (dmsg[i] == '\r' and (i+1 >= dmsg.length() or dmsg[i+1] != '\n'))) {
+          msg += strip_commands(dmsg.substr(start, i-start));
+          start = i+1;
+          msg += '\n';
+          pkat += pkat_base, sc++, retpc++;
+        }
+        continue;
+      }
+      if (dmsg[i] == '\r') 
+        if (i+1 >= dmsg.length() or dmsg[i+1] != '\n') msg += strip_commands(dmsg.substr(start,i-start)), start = i+1, msg += " /  ", sc++, retpc++;
+        else dmsg[i] = ' ';
+      else if (dmsg[i] == '\n') msg += strip_commands(dmsg.substr(start,i-start)), start = i+1, msg += " /  ", sc++, retpc++;
     }
+    if (start < dmsg.length()) msg += strip_commands(dmsg.substr(start));
     
     switch (conv_to_print_to_type)
     {
