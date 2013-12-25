@@ -74,7 +74,16 @@ struct opentaginfo {
   opentaginfo(string n,string a,int sp,int ep): name(n), arg(a), tag_start_pos(sp), tag_end_pos(ep) {}
 };
 
-bool filter_message(int mflags, int window_type, PurpleAccount *account, const char *recipient,char **message,PurpleConversation *conv)
+#define macroflags int mflags, int window_type, PurpleAccount *account, string recipient, string message, PurpleConversation *conv
+struct macro_basic {
+  const char* name;
+  virtual string get_replacement(macroflags) = 0;
+  macro_basic(const char* n): name(n) {}
+  virtual ~macro_basic() {}
+};
+static map<string, macro_basic*> available_macros;
+
+bool filter_message(int mflags, int window_type, PurpleAccount *account, const char *recipient, char **message, PurpleConversation *conv)
 {
   string msg = *message;
   string rs = recipient;
@@ -91,47 +100,11 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
         string c = msg.substr(pstart+2,p-pstart-2);
         if (c != "")
         {
-          bool r=0;
-          string rw="";
-          
-          if (c == "NP")
-            r=1, rw = get_my_name(account);
-          else if (c == "MP")
-            r=1, rw = get_my_email(account);
-          else if (c == "IP")
-            r=1, rw = get_my_ip();
-          else if (c == "MYPSM")
-            r=1, rw = get_my_status(account);
-          else if (c == "N")
-            r=1, rw = buddy_get_uname(account,rs);
-          else if (c == "NN") //Return nick name
-            r=1, rw = buddy_get_alias(account,rs);
-          else if (c == "ME") //Return original sender
-            r=1, rw = buddy_get_alias(account,rs);
-          else if (c == "PSM")
-            r=1, rw = buddy_get_status(account,rs);
-          else if (c == "M")
-            r=1, rw = rs;
-          else if (c == "D")
-            r=1, rw = get_date_numeric();
-          else if (c == "DD")
-            r=1, rw = get_weekday();
-          else if (c == "DM")
-            r=1, rw = get_month();
-          else if (c == "DY")
-            r=1, rw = get_year();
-          else if (c == "T")
-            r=1, rw = get_time();
-          else if (c == "TH")
-            r=1, rw = get_hour();
-          else if (c == "TM")
-            r=1, rw = get_minute();
-          else if (c == "TS")
-            r=1, rw = get_second();
-          
-          if (r)
+          map<string, macro_basic*>:: iterator mac = available_macros.find(c); 
+          if (mac != available_macros.end())
           {
-            msg.replace(pstart, p-pstart+1,rw);
+            string rw = mac->second->get_replacement(mflags, window_type, account, rs, msg, conv);
+            msg.replace(pstart, p-pstart+1, rw);
             p += rw.length() - (p - pstart);
             continue;
           }
@@ -235,3 +208,22 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
   memcpy(*message, src + (*src == '/' and (mflags & MSG_MINE)), msg.length() + not(*src == '/' and (mflags & MSG_MINE)));
   return false;
 }
+
+#define wunused() ((void)mflags), ((void)window_type), ((void)recipient), ((void)message), ((void)conv), (void)account
+struct macro_NP:    macro_basic { macro_NP():    macro_basic("NP")    {} string get_replacement(macroflags) { return get_my_name (account);  wunused(); } };
+struct macro_MP:    macro_basic { macro_MP():    macro_basic("MP")    {} string get_replacement(macroflags) { return get_my_email(account);  wunused(); } };
+struct macro_MYPSM: macro_basic { macro_MYPSM(): macro_basic("MYPSM") {} string get_replacement(macroflags) { return get_my_status(account); wunused(); } };
+struct macro_N:     macro_basic { macro_N():     macro_basic("N")     {} string get_replacement(macroflags) { return buddy_get_uname (account, recipient); wunused(); } };
+struct macro_NN:    macro_basic { macro_NN():    macro_basic("NN")    {} string get_replacement(macroflags) { return buddy_get_alias (account, recipient); wunused(); } }; //Return nick name
+struct macro_ME:    macro_basic { macro_ME():    macro_basic("ME")    {} string get_replacement(macroflags) { return buddy_get_alias (account, recipient); wunused(); } }; //Return original sender
+struct macro_PSM:   macro_basic { macro_PSM():   macro_basic("PSM")   {} string get_replacement(macroflags) { return buddy_get_status(account, recipient); wunused(); } };
+struct macro_M:     macro_basic { macro_M():     macro_basic("M")     {} string get_replacement(macroflags) { return recipient;    wunused(); } };
+struct macro_IP:    macro_basic { macro_IP():    macro_basic("IP")    {} string get_replacement(macroflags) { return get_my_ip();  wunused(); } };
+struct macro_D:     macro_basic { macro_D():     macro_basic("D")     {} string get_replacement(macroflags) { return get_date_numeric(); wunused(); } };
+struct macro_DD:    macro_basic { macro_DD():    macro_basic("DD")    {} string get_replacement(macroflags) { return get_weekday(); wunused(); } };
+struct macro_DM:    macro_basic { macro_DM():    macro_basic("DM")    {} string get_replacement(macroflags) { return get_month();   wunused(); } };
+struct macro_DY:    macro_basic { macro_DY():    macro_basic("DY")    {} string get_replacement(macroflags) { return get_year();    wunused(); } };
+struct macro_T:     macro_basic { macro_T():     macro_basic("T")     {} string get_replacement(macroflags) { return get_time();    wunused(); } };
+struct macro_TH:    macro_basic { macro_TH():    macro_basic("TH")    {} string get_replacement(macroflags) { return get_hour();    wunused(); } };
+struct macro_TM:    macro_basic { macro_TM():    macro_basic("TM")    {} string get_replacement(macroflags) { return get_minute();  wunused(); } };
+struct macro_TS:    macro_basic { macro_TS():    macro_basic("TS")    {} string get_replacement(macroflags) { return get_second();  wunused(); } };

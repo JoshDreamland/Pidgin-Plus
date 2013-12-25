@@ -31,7 +31,7 @@ plus_v8_instance *plus_v8_global;
 
 
 // These are just convenient
-const char* ToCString(const String::Utf8Value& value,const char* ifnull){
+const char* ToCString(const String::Utf8Value& value,const char* ifnull) {
   return *value ? *value : ifnull;
 }
 string ValueToStr(Handle<Value> val)

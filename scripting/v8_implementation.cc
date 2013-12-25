@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <glib-2.0/glib.h>
+#include <sys/time.h>
 using namespace std;
 
 //Assuming those who want to compile this have 
@@ -87,7 +88,7 @@ intptr_t CALL_ID = 0;
 /// Static callback to kill the running V8 thread if it's been open for too long.
 static gpointer kill_v8_if_it_takes_too_long(gpointer data)
 {
-  usleep(1000000); //Unix only. Sorry Windows fans, go fuck yourselves.
+  usleep(1000000); // GNU only. Sorry, MSVS fans: go fuck yourselves.
   if (CALL_ID == intptr_t(data))
     V8::TerminateExecution();
   return NULL;

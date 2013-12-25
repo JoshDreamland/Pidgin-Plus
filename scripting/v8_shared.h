@@ -31,7 +31,7 @@ using namespace std;
 using namespace v8;
 
 string ValueToStr(Handle<Value>);
-const char* ToCString(const String::Utf8Value&,const char* = "<string conversion failed>");
+const char* ToCString(const String::Utf8Value&, const char* = "<string conversion failed>");
 
 extern struct plus_v8_instance {
   // This block of declarations CANNOT BE REORDERED. 
