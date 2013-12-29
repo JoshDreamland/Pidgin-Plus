@@ -44,26 +44,30 @@ static double vs_to_double(const char* x)
 Begin_JavaScript_Functions
 //{
     Begin_SubClass(version)
-        static Handle<Value> toString(const Arguments&)  {
-          return String::New("Pidgin Plus! Version 0.00.01"); }
-        static Handle<Value> valueOf (const Arguments&)  {
-          return Integer::New(5); }
+        static v8_funcresult toString(v8_funcargs args)  {
+          return GV8::Return(args, GV8::String(args.GetIsolate(), "Pidgin Plus! Version 0.00.01"));
+        }
+        static v8_funcresult valueOf (v8_funcargs args)  {
+          return GV8::Return(args, Integer::New(5));
+        }
         
         void construct () {
-          me->Set(String::New("toString"), FunctionTemplate::New(toString) );
-          me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
+          me->Set(GV8::String(plus_v8_global->isolate, "toString"), FunctionTemplate::New(plus_v8_global->isolate, toString) );
+          me->Set(GV8::String(plus_v8_global->isolate, "valueOf"),  FunctionTemplate::New(plus_v8_global->isolate, valueOf)  );
         }
     End_SubClass(version)
     
     Begin_SubClass(v8version)
-        static Handle<Value> toString(const Arguments&)  {
-          return String::New((string("Google V8 version ") + V8::GetVersion()).c_str()); }
-        static Handle<Value> valueOf (const Arguments&)  {
-          return Number::New(vs_to_double(V8::GetVersion())); }
+        static v8_funcresult toString(v8_funcargs args)  {
+          return GV8::Return(args, GV8::String((string("Google V8 version ") + V8::GetVersion()).c_str()));
+        }
+        static v8_funcresult valueOf (v8_funcargs args)  {
+          return GV8::Return(args, Number::New(vs_to_double(V8::GetVersion())));
+        }
         
         void construct () {
-          me->Set(String::New("toString"), FunctionTemplate::New(toString) );
-          me->Set(String::New("valueOf"),  FunctionTemplate::New(valueOf)  );
+          me->Set(GV8::String("toString"), FunctionTemplate::New(toString) );
+          me->Set(GV8::String("valueOf"),  FunctionTemplate::New(valueOf)  );
         }
     End_SubClass(v8version)
 //}

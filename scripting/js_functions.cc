@@ -40,9 +40,8 @@ void jsSubClass_basic::construct() { }
 
 
 static void object_add_to_global(Handle<ObjectTemplate> obj, const char* name) {
-  plus_v8_global->object_template->Set(String::New(name), obj);
+  plus_v8_global->global->Set(GV8::String(name), obj);
 }
-
 
 void js_functions_initialize()
 {
@@ -56,13 +55,13 @@ void js_functions_initialize()
     
     // Add all its functions in
     for (jsFuncDesc* f = obj->myFunctions; f->name and f->jsFunc; f++)
-      obj->me->Set(String::New(f->name), FunctionTemplate::New(f->jsFunc));
+      obj->me->Set(GV8::String(f->name), FunctionTemplate::New(f->jsFunc));
     
     // Add all its classes in
     for (jsClassDesc* c = obj->myClasses; c->name and c->jsSubClass; c++)
     {
       c->jsSubClass->me = ObjectTemplate::New();
-      obj->me->Set(String::New(c->name), c->jsSubClass->me);
+      obj->me->Set(GV8::String(c->name), c->jsSubClass->me);
       c->jsSubClass->construct();
     }
     object_add_to_global(obj->me, obj->name);

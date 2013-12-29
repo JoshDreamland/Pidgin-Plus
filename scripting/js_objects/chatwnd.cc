@@ -20,6 +20,7 @@
 
 #include "js_objects_basics.h"
 #include "../../purple_frontend/purple_extension.h"
+#include "../v8_shared.h"
 
 #define NAME ChatWnd
 
@@ -27,11 +28,12 @@ extern int prints_remaining;
 
 Begin_JavaScript_Functions
 //{
-    static Handle<Value> SendMessage(const Arguments& args)
+    static v8_funcresult SendMessage(v8_funcargs args)
     {
+      Isolate *iso = args.GetIsolate();
+      HandleScope handle_scope(iso);
       for (int i = 0; i < args.Length(); i++)
       {
-        HandleScope handle_scope;
         String::Utf8Value str(args[i]);
         string cstr = ToCString(str);
         if (cstr.length() > 512)
@@ -39,12 +41,11 @@ Begin_JavaScript_Functions
           cstr.erase(511);
           cstr[508] = cstr[509] = cstr[510] = '.';
         }
-	int linesprinted = pidgin_printf(cstr.c_str());
+      int linesprinted = pidgin_printf(cstr.c_str());
         prints_remaining -= linesprinted ? linesprinted : 1;
         if (prints_remaining <= 0)
-          return ThrowException(String::New("Too many messages sent in one script event"));
+          return void(iso->ThrowException(GV8::String(iso, "Too many messages sent in one script event")));
       }
-      return Undefined();
     }
 //}
 End_JavaScript_Functions

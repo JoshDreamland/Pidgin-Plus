@@ -27,19 +27,19 @@
 #include <string>
 using std::string;
 
-extern const char* unicode_doublestrike;
-extern const char* unicode_fraktur;
-extern const char* unicode_sansserif;
-extern const char* unicode_sansbold;
-extern const char* unicode_sansitalic;
-extern const char* unicode_sansbolditalic;
-extern const char* unicode_monospace;
-extern const char* unicode_script;
-extern const char* unicode_serifbold;
-extern const char* unicode_serifitalic;
-extern const char* unicode_serifbolditalic;
-extern const char* unicode_braille;
-extern const char* unicode_circled;
+extern const char* pplus_unicode_doublestrike;
+extern const char* pplus_unicode_fraktur;
+extern const char* pplus_unicode_sansserif;
+extern const char* pplus_unicode_sansbold;
+extern const char* pplus_unicode_sansitalic;
+extern const char* pplus_unicode_sansbolditalic;
+extern const char* pplus_unicode_monospace;
+extern const char* pplus_unicode_script;
+extern const char* pplus_unicode_serifbold;
+extern const char* pplus_unicode_serifitalic;
+extern const char* pplus_unicode_serifbolditalic;
+extern const char* pplus_unicode_braille;
+extern const char* pplus_unicode_circled;
 
 extern const string msgplus_bold;
 extern const string msgplus_italic;

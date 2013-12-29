@@ -22,9 +22,10 @@
  * along with this program; if not, see <www.gnu.org/licenses>
 */
 
-extern void load_bb_formatting();
-void load_bb_unicode();
+#include "bbcode_formatting.h"
+#include <cstdio>
 static void load_bbcode() {
+  puts("Loading BBCode...");
   load_bb_formatting();
   load_bb_unicode();
 }

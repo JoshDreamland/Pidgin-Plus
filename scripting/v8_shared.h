@@ -18,29 +18,56 @@
  *
  */
  
-#ifndef _V8_SHARED_H
-#define _V8_SHARED_H
+#ifndef _V8_SHARED__H
+#define _V8_SHARED__H
 
 #include <string>
 using namespace std;
 
 //Assuming those who want to compile this have 
 //checked out V8 as per my well-hidden instruction
-#include "../google_v8/v8-read-only/include/v8.h"
+#include "google_v8/v8-read-only/include/v8.h"
 
 using namespace v8;
 
 string ValueToStr(Handle<Value>);
 const char* ToCString(const String::Utf8Value&, const char* = "<string conversion failed>");
 
+typedef void v8_funcresult;
+typedef const v8::FunctionCallbackInfo<Value>& v8_funcargs;
+
+/// We'll only be using one of these, but the ctor does a lot, so we'll be allocating it dynamically.
 extern struct plus_v8_instance {
-  // This block of declarations CANNOT BE REORDERED. 
-  // Each one has a complicated-ASS private constructor.
-  // Rearranging or removing these declarations could cause V8 to not work.
-  HandleScope               scope; //Global scope
-  Handle<ObjectTemplate>    object_template; //Containing global "this"
-  Handle<Context>           context; //Global Context
+  Isolate*               isolate;  ///< Big-scale isolate. I think it's one per process.
+  HandleScope            scope;    ///< I don't know why this is required here, but it's important.
+  Handle<ObjectTemplate> global;   ///< This is the thing we add objects into, then pass to Context::New.
+  Handle<Context>        context;  ///< Finally, the context, which depends on everything above. Initialized in begin().
+  
+  /// Creates and enters the context; must be called AFTER defining all functions, etc.
+  void begin();
+  /// Ends whatever begin() begins.
+  void end();
+  
+  // Prevent getting bitten by changes to the V8 API.
+  /// Construct a V8 String from an std::string.
+  Local<String> NewString(std::string str);
+  /// Construct a V8 String from a C string.
+  Local<String> NewString(const char* str);
+  
+  /// Construct, creating a bunch of V8 stuff.
   plus_v8_instance();
+  
+  private:
+    bool begun;
+  
 } *plus_v8_global;
+
+namespace GV8 {
+  v8::Local<v8::String> String(std::string x);
+  v8::Local<v8::String> String(const char* x);
+  v8::Local<v8::String> String(Isolate *iso, std::string x);
+  v8::Local<v8::String> String(Isolate *iso, const char* x);
+  v8_funcresult Return(v8_funcargs args, Handle<Value> val);
+}
 
 #endif

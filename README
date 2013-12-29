@@ -1,10 +1,18 @@
 Pidgin Plus! is a free-software project intended to make Pidgin more comfortable across multiple
 protocols by unifying commands as done in Messenger Plus! for Windows Messenger.
 
-Pidgin Plus! incorporates a JavaScript based scripting system powered by Google V8, in order to
-promote simpler plugin authoring. At the moment, this functionality is experimental. You can try
-it out by prefixing messages with "js:" (the remainder of the message will be executed by V8 as
-JavaScript).
+Pidgin Plus! incorporates a JavaScript based scripting system powered by Google V8, in order to promote simpler plugin authoring. At the moment, this functionality is experimental. You can try it out by prefixing messages with "js:" (the remainder of the message will be executed by V8 as JavaScript).
+
+== Purpose ==
+
+The point of this plugin is to make simple plugin authoring simple. And also to make it not perl. Compatibility with Messenger Plus! is a side goal. The rationale for its use is as follows:
+
+When I was 13 years old, I downloaded Messenger Plus! and wrote scripts for it with ease, proficiency, and a certain gleeful satisfaction.
+The last person who wrote a pidgin plugin of comparable potency was 36. He barely made it work, hated every miserable hour of it.
+
+The goal of this project is for it to take a 13-year-old 12 minutes to figure out how to write a plugin that automatically replies to "hello." 
+
+== Commands ==
 
 The following commands are introduced for all protocols:
 /appearoffline - Sets the status to "Invisible."
@@ -19,3 +27,25 @@ The following commands are introduced for all protocols:
 /onphone - Sets the status to "Busy." This is from an old MSN Plus! version.
 /say - Sends a message, in the current window, as yourself. Not very useful.
 /signout - Disconnect from all protocols.
+
+
+== Building ==
+
+Pidgin Plus! comes with scripts to checkout and build the latest V8. This build system has only been tested on Ubuntu and is likely to fail on any other distribution. Building for Windows is probably never going to happen by my hands.
+
+Notes:
+- V8 depends on ICU. Its maintainers ship a script to download and build a version of ICU with it. It is impossible to cleanly coerce V8 into building this with -fPIC, and so the use_system_icu flag is set for building.
+
+  `$ make CXXFLAGS=-fPIC CPPFLAGS=-fPIC native GYPFLAGS="-Duse_system_icu=1"`
+
+- The V8 API has changed drastically since 1904 when Ubuntu last pulled. Thus, this plugin will not compile with the distribution libv8 package. I have not tested this on Arch. 
+- The V8 documentation was last updated about the time Ubuntu last pulled.
+  - You will not find any information on the new replacement for String::New.
+    - I created a function to create strings, in case this function changes again.
+  - The build system now uses GYP; I don't know what it is with big projects and esoteric build systems, but,
+    - No one has documented how to do anything with GYP.
+    - The existing documentation refers to GYP_DEFINES; the correct macro is GYPFLAGS (the other macro may exist somewhere, but does nothing in the makefile)
+
+
+
+

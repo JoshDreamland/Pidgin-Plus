@@ -23,6 +23,7 @@
 **/
 
 #include "bbcode_iface.h"
+#include "bbcode_formatting.h"
 
 /// Struct defining the bold tag, [b].
 struct boldtag: bbcode_tag {
@@ -84,7 +85,6 @@ struct rainbowwordtag: bbcode_tag {
   rainbowwordtag(): bbcode_tag("rbw",false) {}
 };
 
-void load_bb_formatting();
 void load_bb_formatting() {
   new boldtag;
   new italictag;

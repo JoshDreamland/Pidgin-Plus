@@ -20,13 +20,13 @@
 
 #include <vector>
 using namespace std;
-#include "../v8_shared.h"
-#include "glib-2.0/glib.h"
+#include "scripting/v8_shared.h"
+#include <glib.h>
 
 struct jsFuncDesc
 {
   const char* name;
-  Handle<Value> (*jsFunc)(const Arguments& args);
+  v8_funcresult (*jsFunc)(v8_funcargs args);
 };
 struct jsClassDesc
 {

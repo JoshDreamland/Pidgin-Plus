@@ -29,7 +29,7 @@
 using std::string;
 using std::map;
 
-
+/// Structure representing a usable BBCode tag.
 struct bbcode_tag {
   static map<string,double> vars; ///< Real-valued variables needed by the functions during BB parsing.
   static map<string,string> svars; ///< String-valued variables needed by the functions during BB parsing.

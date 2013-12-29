@@ -1,5 +1,30 @@
+/**
+ * @file   bbcode_iface.cc
+ * @brief  Source implementing formatting BBtags.
+ * 
+ * @section License
+ * 
+ * Pidgin Plus! Plugin
+ *
+ * Copyright (C) 2009 Josh Ventura
+ *
+ * Pidgin Plus! is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <www.gnu.org/licenses>
+**/
+
 #include "bbcode_iface.h"
 #include <basics/basics.h>
+
 bbcode_tag::bbcode_tag(string name, bool is_unary): unary(is_unary) { bbcode_tags[name] = this; }
 bbcode_tag::~bbcode_tag() { }
 
@@ -13,29 +38,28 @@ map<string,string> bbcode_tag::svars; ///< String-valued variables needed by the
 bool bbcode_tag::at(const char *msg, int pos, bbcode_tag::instance &inst) {
   if (msg[pos] != '[')
     return false;
-  puts("Looks like we're at a tag...");
   
   int ctsp = pos; // Complete tag starting position
   
   inst.closing = false; // Whether this is a closing tag (denoted by /).
   if (msg[++pos] == '/') {
     inst.closing = true;
-    puts("Looks like we're at a closing tag...");
     pos++;
   }
-  if (!is_letter(msg[pos])) return false;
-  puts("We certainly seem to be at a tag...");
+  
+  if (!is_letter(msg[pos]))
+    return false;
+  
   const int ts = pos;
   while (is_letterd(msg[++pos]));
   
   inst.name = string(msg,ts,pos-ts);
   bbiter bit = bbcode_tags.find(inst.name);
-  printf("Yeah, the tag's called '%s'...\n", inst.name.c_str());
+  
   if (bit == bbcode_tags.end()) return false;
   inst.tag = bit->second;
   inst.unary = bit->second->unary;
   inst.arg = "";
-  puts("It even exists...");
   
   if (msg[pos] == '=') {
     const int as = ++pos;
@@ -43,10 +67,10 @@ bool bbcode_tag::at(const char *msg, int pos, bbcode_tag::instance &inst) {
     if (msg[pos] != ']') { return false; }
     inst.arg = string(msg,as,pos-as);
   }
-  puts("We have most of a tag...");
+  
   if (msg[pos] != ']')
-    { return false; }
-  puts("We have a tag!");
+    return false;
+  
   inst.length = pos - ctsp + 1;
   return true;
 }

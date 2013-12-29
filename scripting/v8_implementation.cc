@@ -31,8 +31,9 @@
 
 #include <map>
 #include <string>
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <sys/time.h>
+#include <unistd.h>
 using namespace std;
 
 //Assuming those who want to compile this have 
@@ -50,16 +51,16 @@ extern void pidgin_printf(const char*);
 map <string, PPlus_Script> scripts;
 
 //Functions
-static bool          ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions);
-static void          ReportException(TryCatch* handler);
-//static Handle<Value> Print(const Arguments& args);
+static bool ExecuteString(string source, string name, bool print_result, bool report_exceptions);
+static void ReportException(TryCatch* handler);
 
 
 int plus_v8_init()
 {
+  v8::V8::InitializeICU();
   plus_v8_global = new plus_v8_instance();
-  js_functions_initialize(); // see javascript_functions.cc
-  plus_v8_global->context = Context::New(NULL, plus_v8_global->object_template);
+  js_functions_initialize();
+  plus_v8_global->begin();
   return 0;
 }
 
@@ -73,8 +74,8 @@ int plus_evaluate_js_line(const char* line)
     lastmessages[1] = lastmessages[0];
     lastmessages[0] = line;
   }
-  v8::HandleScope handle_scope;
-  ExecuteString(String::New(line), "(shell)", true, true);
+  HandleScope hs(plus_v8_global->isolate);
+  ExecuteString(line, "(shell)", true, true);
   return 0;
 }
 
@@ -105,16 +106,16 @@ int plus_v8_wipe() {
 }
 
 //Returns true if successful
-static bool load_script(Handle<String> source, string name)
+static bool load_script(string source, string name)
 {
-  Handle<Script> scr = Script::Compile(source, String::New(name.c_str()));
+  Handle<Script> scr = Script::Compile(GV8::String(source.c_str()), GV8::String(name.c_str()));
   if (scr.IsEmpty())
     return 0;
   scripts[name].script = scr;
   return 1;
 }
 // Executes a string within the current v8 context.
-bool ExecuteString(Handle<String> source, string name, bool print_result, bool report_exceptions)
+bool ExecuteString(string source, string name, bool print_result, bool report_exceptions)
 {
   TryCatch try_catch;
   Context::Scope scope(plus_v8_global->context);
@@ -124,16 +125,14 @@ bool ExecuteString(Handle<String> source, string name, bool print_result, bool r
   
   if (load_script(source,name))
   {
-    HandleScope handle_scope;
-    
     //Thread a killer and run the code.
     Handle<Value> result;
     try {
-      g_thread_create(kill_v8_if_it_takes_too_long,(gpointer)CALL_ID,false,NULL);
+      g_thread_new("kill-v8-if-it-takes-too-long", kill_v8_if_it_takes_too_long, (gpointer)CALL_ID);
       result = scripts[name].script->Run();
       CALL_ID++;
-    } catch(int x) { result = String::New("A system exception was thrown."); }
-      catch(const char* x) { result = String::New(x); }
+    } catch(int x) { result = GV8::String("A system exception was thrown."); }
+      catch(const char* x) { result = GV8::String(x); }
     
     if (result.IsEmpty())
     {
@@ -147,7 +146,7 @@ bool ExecuteString(Handle<String> source, string name, bool print_result, bool r
       if (print_result && !result->IsUndefined())
       {
         String::Utf8Value str(result);
-        string cstr = ToCString(str,"Result cannot be converted to string");
+        string cstr = ToCString(str, "Result cannot be converted to string");
         if (cstr.length() > 512)
         {
           cstr.erase(511);
@@ -165,7 +164,6 @@ bool ExecuteString(Handle<String> source, string name, bool print_result, bool r
 
 void ReportException(TryCatch* try_catch)
 {
-  HandleScope handle_scope;
   String::Utf8Value exception(try_catch->Exception());
   const char* exception_string = ToCString(exception,"Exception occurred but cannot be converted to string");
   Handle<Message> message = try_catch->Message();

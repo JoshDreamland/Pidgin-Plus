@@ -38,6 +38,7 @@
 		</Unit>
 		<Unit filename="basics/basics.h" />
 		<Unit filename="commands_and_macros/bbcode_formatting.cc" />
+		<Unit filename="commands_and_macros/bbcode_formatting.h" />
 		<Unit filename="commands_and_macros/bbcode_iface.cc" />
 		<Unit filename="commands_and_macros/bbcode_iface.h" />
 		<Unit filename="commands_and_macros/bbcode_load.h" />
@@ -61,7 +62,6 @@
 		<Unit filename="purple_frontend/simplified_flags.h" />
 		<Unit filename="scripting/js_functions.cc" />
 		<Unit filename="scripting/js_functions.h" />
-		<Unit filename="scripting/js_objects/adder.cc" />
 		<Unit filename="scripting/js_objects/chatwnd.cc" />
 		<Unit filename="scripting/js_objects/js_objects_basics.cc" />
 		<Unit filename="scripting/js_objects/js_objects_basics.h" />
