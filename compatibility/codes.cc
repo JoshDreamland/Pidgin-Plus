@@ -25,20 +25,20 @@
 
 #include "codes.h"
 
-const char* pplus_unicode_doublestrike    = "í´“í¸½Ô¹â„‚í´“í»½Ô¼í´“í½½Ô¾â„í´”í°½Õí´”í²½Õƒí´”í´¢Ä•í´”í¶¢Ä™â„šâ„í´”íº½Õ‹í´”í¼½Õí´”í¾½Õí´•í°¢Ä¤í´•í²½Õ“í´•í´½Õ•í´•í¶½Õ—í´•í¸½Õ™í´•íº½Õ›í´•í¼½Õí´•í¾½ÕŸí´–í°½Õ¡í´–í²½Õ£í´–í´½Õ¥í´–í¶½Õ§í´–í¸½Õ©í´–íº½Õ«";
-const char* pplus_unicode_fraktur         = "í´–í¼½Õ­í´–í¾½Õ¯í´—í°½Õ±í´—í²½Õ³í´—í´½Õµí´—í¶½Õ·í´—í¸½Õ¹í´—íº½Õ»í´—í¼½Õ½í´—í¾½Õ¿í´˜í°½Öí´˜í²½Öƒí´˜í´½Ö…í´˜í¶½Ö‡í´˜í¸½Ö‰í´˜íº½Ö‹í´˜í¼½Öí´˜í¾½Öí´™í°½Ö‘í´™í²½Ö“í´™í´½Ö•í´™í¶½Ö—í´™í¸½Ö™í´™íº½Ö›í´™í¼½Öí´™í¾½ÖŸ";
-const char* pplus_unicode_sansserif       = "í´ší°½Ö¡í´ší²½Ö£í´ší´½Ö¥í´ší¶½Ö§í´ší¸½Ö©í´šíº½Ö«í´ší¼½Ö­í´ší¾½Ö¯í´›í°½Ö±í´›í²½Ö³í´›í´½Öµí´›í¶½Ö·í´›í¸½Ö¹í´›íº½Ö»í´›í¼½Ö½í´›í¾½Ö¿í´œí°½×í´œí²½×ƒí´œí´½×…í´œí¶½×‡í´œí¸½×‰í´œíº½×‹í´œí¼½×í´œí¾½×í´í°½×‘í´í²½×“";
-const char* pplus_unicode_sansbold        = "í´í´½×•í´í¶½×—í´í¸½×™í´íº½×›í´í¼½×í´í¾½×Ÿí´ží°½×¡í´ží²½×£í´ží´½×¥í´ží¶½×§í´ží¸½×©í´žíº½×«í´ží¼½×­í´ží¾½×¯í´Ÿí°½×±í´Ÿí²½×³í´Ÿí´½×µí´Ÿí¶½×·í´Ÿí¸½×¹í´Ÿíº½×»í´Ÿí¼½×½í´Ÿí¾½×¿í´ í°½Øí´ í²½Øƒí´ í´½Ø…í´ í¶½Ø‡";
-const char* pplus_unicode_sansitalic      = "í´ í¸½Ø‰í´ íº½Ø‹í´ í¼½Øí´ í¾½Øí´¡í°½Ø‘í´¡í²½Ø“í´¡í´½Ø•í´¡í¶½Ø—í´¡í¸½Ø™í´¡íº½Ø›í´¡í¼½Øí´¡í¾½ØŸí´¢í°½Ø¡í´¢í²½Ø£í´¢í´½Ø¥í´¢í¶½Ø§í´¢í¸½Ø©í´¢íº½Ø«í´¢í¼½Ø­í´¢í¾½Ø¯í´£í°½Ø±í´£í²½Ø³í´£í´½Øµí´£í¶½Ø·í´£í¸½Ø¹í´£íº½Ø»";
-const char* pplus_unicode_sansbolditalic  = "í´£í¼½Ø½í´£í¾½Ø¿í´¤í°½Ùí´¤í²½Ùƒí´¤í´½Ù…í´¤í¶½Ù‡í´¤í¸½Ù‰í´¤íº½Ù‹í´¤í¼½Ùí´¤í¾½Ùí´¥í°½Ù‘í´¥í²½Ù“í´¥í´½Ù•í´¥í¶½Ù—í´¥í¸½Ù™í´¥íº½Ù›í´¥í¼½Ùí´¥í¾½ÙŸí´¦í°½Ù¡í´¦í²½Ù£í´¦í´½Ù¥í´¦í¶½Ù§í´¦í¸½Ù©í´¦íº½Ù«í´¦í¼½Ù­í´¦í¾½Ù¯";
-const char* pplus_unicode_monospace       = "í´§í°½Ù±í´§í²½Ù³í´§í´½Ùµí´§í¶½Ù·í´§í¸½Ù¹í´§íº½Ù»í´§í¼½Ù½í´§í¾½Ù¿í´¨í°½Úí´¨í²½Úƒí´¨í´½Ú…í´¨í¶½Ú‡í´¨í¸½Ú‰í´¨íº½Ú‹í´¨í¼½Úí´¨í¾½Úí´©í°½Ú‘í´©í²½Ú“í´©í´½Ú•í´©í¶½Ú—í´©í¸½Ú™í´©íº½Ú›í´©í¼½Úí´©í¾½ÚŸí´ªí°½Ú¡í´ªí²½Ú£";
-const char* pplus_unicode_script          = "í´í°½Ó‘í´í²½Ó“í´í´½Ó•í´í¶½Ó—í´í¸½Ó™í´íº½Ó›í´í¼½Óí´í¾½ÓŸí´Ží°½Ó¡í´Ží²½Ó£í´Ží´½Ó¥í´Ží¶½Ó§í´Ží¸½Ó©í´Žíº½Ó«í´Ží¼½Ó­í´Ží¾½Ó¯í´í°½Ó±í´í²½Ó³í´í´½Óµí´í¶½Ó·í´í¸½Ó¹í´íº½Ó»í´í¼½Ó½í´í¾½Ó¿í´í°½Ôí´í²½Ôƒ";
-const char* pplus_unicode_serifbold       = "í´€í°½Ðí´€í²½Ðƒí´€í´½Ð…í´€í¶½Ð‡í´€í¸½Ð‰í´€íº½Ð‹í´€í¼½Ðí´€í¾½Ðí´í°½Ð‘í´í²½Ð“í´í´½Ð•í´í¶½Ð—í´í¸½Ð™í´íº½Ð›í´í¼½Ðí´í¾½ÐŸí´‚í°½Ð¡í´‚í²½Ð£í´‚í´½Ð¥í´‚í¶½Ð§í´‚í¸½Ð©í´‚íº½Ð«í´‚í¼½Ð­í´‚í¾½Ð¯í´ƒí°½Ð±í´ƒí²½Ð³";
-const char* pplus_unicode_serifitalic     = "í´ƒí´½Ðµí´ƒí¶½Ð·í´ƒí¸½Ð¹í´ƒíº½Ð»í´ƒí¼½Ð½í´ƒí¾½Ð¿í´„í°½Ñí´„í²½Ñƒí´„í´½Ñ…í´„í¶½Ñ‡í´„í¸½Ñ‰í´„íº½Ñ‹í´„í¼½Ñí´„í¾½Ñí´…í°½Ñ‘í´…í²½Ñ“í´…í´¢ÄŽí´…í¶½Ñ—í´…í¸½Ñ™í´…íº½Ñ›í´…í¼½Ñí´…í¾½ÑŸí´†í°½Ñ¡í´†í²½Ñ£í´†í´½Ñ¥í´†í¶½Ñ§";
-const char* pplus_unicode_serifbolditalic = "í´†í¸½Ñ©í´†íº½Ñ«í´†í¼½Ñ­í´†í¾½Ñ¯í´‡í°½Ñ±í´‡í²½Ñ³í´‡í´½Ñµí´‡í¶½Ñ·í´‡í¸½Ñ¹í´‡íº½Ñ»í´‡í¼½Ñ½í´‡í¾½Ñ¿í´ˆí°½Òí´ˆí²½Òƒí´ˆí´½Ò…í´ˆí¶½Ò‡í´ˆí¸½Ò‰í´ˆíº½Ò‹í´ˆí¼½Òí´ˆí¾½Òí´‰í°½Ò‘í´‰í²½Ò“í´‰í´½Ò•í´‰í¶½Ò—í´‰í¸½Ò™í´‰íº½Ò›";
+const char* pplus_unicode_doublestrike    = "ð”¸ð”¹â„‚ð”»ð”¼ð”½ð”¾â„ð•€ð•ð•‚ð•ƒð•„â„•ð•†â„™â„šâ„ð•Šð•‹ð•Œð•ð•Žð•ð•â„¤ð•’ð•“ð•”ð••ð•–ð•—ð•˜ð•™ð•šð•›ð•œð•ð•žð•Ÿð• ð•¡ð•¢ð•£ð•¤ð•¥ð•¦ð•§ð•¨ð•©ð•ªð•«";
+const char* pplus_unicode_fraktur         = "ð•¬ð•­ð•®ð•¯ð•°ð•±ð•²ð•³ð•´ð•µð•¶ð•·ð•¸ð•¹ð•ºð•»ð•¼ð•½ð•¾ð•¿ð–€ð–ð–‚ð–ƒð–„ð–…ð–†ð–‡ð–ˆð–‰ð–Šð–‹ð–Œð–ð–Žð–ð–ð–‘ð–’ð–“ð–”ð–•ð––ð–—ð–˜ð–™ð–šð–›ð–œð–ð–žð–Ÿ";
+const char* pplus_unicode_sansserif       = "ð– ð–¡ð–¢ð–£ð–¤ð–¥ð–¦ð–§ð–¨ð–©ð–ªð–«ð–¬ð–­ð–®ð–¯ð–°ð–±ð–²ð–³ð–´ð–µð–¶ð–·ð–¸ð–¹ð–ºð–»ð–¼ð–½ð–¾ð–¿ð—€ð—ð—‚ð—ƒð—„ð—…ð—†ð—‡ð—ˆð—‰ð—Šð—‹ð—Œð—ð—Žð—ð—ð—‘ð—’ð—“";
+const char* pplus_unicode_sansbold        = "ð—”ð—•ð—–ð——ð—˜ð—™ð—šð—›ð—œð—ð—žð—Ÿð— ð—¡ð—¢ð—£ð—¤ð—¥ð—¦ð—§ð—¨ð—©ð—ªð—«ð—¬ð—­ð—®ð—¯ð—°ð—±ð—²ð—³ð—´ð—µð—¶ð—·ð—¸ð—¹ð—ºð—»ð—¼ð—½ð—¾ð—¿ð˜€ð˜ð˜‚ð˜ƒð˜„ð˜…ð˜†ð˜‡";
+const char* pplus_unicode_sansitalic      = "ð˜ˆð˜‰ð˜Šð˜‹ð˜Œð˜ð˜Žð˜ð˜ð˜‘ð˜’ð˜“ð˜”ð˜•ð˜–ð˜—ð˜˜ð˜™ð˜šð˜›ð˜œð˜ð˜žð˜Ÿð˜ ð˜¡ð˜¢ð˜£ð˜¤ð˜¥ð˜¦ð˜§ð˜¨ð˜©ð˜ªð˜«ð˜¬ð˜­ð˜®ð˜¯ð˜°ð˜±ð˜²ð˜³ð˜´ð˜µð˜¶ð˜·ð˜¸ð˜¹ð˜ºð˜»";
+const char* pplus_unicode_sansbolditalic  = "ð˜¼ð˜½ð˜¾ð˜¿ð™€ð™ð™‚ð™ƒð™„ð™…ð™†ð™‡ð™ˆð™‰ð™Šð™‹ð™Œð™ð™Žð™ð™ð™‘ð™’ð™“ð™”ð™•ð™–ð™—ð™˜ð™™ð™šð™›ð™œð™ð™žð™Ÿð™ ð™¡ð™¢ð™£ð™¤ð™¥ð™¦ð™§ð™¨ð™©ð™ªð™«ð™¬ð™­ð™®ð™¯";
+const char* pplus_unicode_monospace       = "ð™°ð™±ð™²ð™³ð™´ð™µð™¶ð™·ð™¸ð™¹ð™ºð™»ð™¼ð™½ð™¾ð™¿ðš€ðšðš‚ðšƒðš„ðš…ðš†ðš‡ðšˆðš‰ðšŠðš‹ðšŒðšðšŽðšðšðš‘ðš’ðš“ðš”ðš•ðš–ðš—ðš˜ðš™ðššðš›ðšœðšðšžðšŸðš ðš¡ðš¢ðš£";
+const char* pplus_unicode_script          = "ð“ð“‘ð“’ð““ð“”ð“•ð“–ð“—ð“˜ð“™ð“šð“›ð“œð“ð“žð“Ÿð“ ð“¡ð“¢ð“£ð“¤ð“¥ð“¦ð“§ð“¨ð“©ð“ªð“«ð“¬ð“­ð“®ð“¯ð“°ð“±ð“²ð“³ð“´ð“µð“¶ð“·ð“¸ð“¹ð“ºð“»ð“¼ð“½ð“¾ð“¿ð”€ð”ð”‚ð”ƒ";
+const char* pplus_unicode_serifbold       = "ð€ðð‚ðƒð„ð…ð†ð‡ðˆð‰ðŠð‹ðŒððŽððð‘ð’ð“ð”ð•ð–ð—ð˜ð™ðšð›ðœððžðŸð ð¡ð¢ð£ð¤ð¥ð¦ð§ð¨ð©ðªð«ð¬ð­ð®ð¯ð°ð±ð²ð³";
+const char* pplus_unicode_serifitalic     = "ð´ðµð¶ð·ð¸ð¹ðºð»ð¼ð½ð¾ð¿ð‘€ð‘ð‘‚ð‘ƒð‘„ð‘…ð‘†ð‘‡ð‘ˆð‘‰ð‘Šð‘‹ð‘Œð‘ð‘Žð‘ð‘ð‘‘ð‘’ð‘“ð‘”â„Žð‘–ð‘—ð‘˜ð‘™ð‘šð‘›ð‘œð‘ð‘žð‘Ÿð‘ ð‘¡ð‘¢ð‘£ð‘¤ð‘¥ð‘¦ð‘§";
+const char* pplus_unicode_serifbolditalic = "ð‘¨ð‘©ð‘ªð‘«ð‘¬ð‘­ð‘®ð‘¯ð‘°ð‘±ð‘²ð‘³ð‘´ð‘µð‘¶ð‘·ð‘¸ð‘¹ð‘ºð‘»ð‘¼ð‘½ð‘¾ð‘¿ð’€ð’ð’‚ð’ƒð’„ð’…ð’†ð’‡ð’ˆð’‰ð’Šð’‹ð’Œð’ð’Žð’ð’ð’‘ð’’ð’“ð’”ð’•ð’–ð’—ð’˜ð’™ð’šð’›";
 const char* pplus_unicode_braille         = "â â ƒâ ‰â ™â ‘â ‹â ›â “â Šâ šâ …â ‡â â â •â â Ÿâ —â Žâ žâ ¥â §â ºâ ­â ½â µâ â ƒâ ‰â ™â ‘â ‹â ›â “â Šâ šâ …â ‡â â â •â â Ÿâ —â Žâ žâ ¥â §â ºâ ­â ½â µ";
 const char* pplus_unicode_circled         = "â’¶â’·â’¸â’¹â’ºâ’»â’¼â’½â’¾â’¿â“€â“â“‚â“ƒâ“„â“…â“†â“‡â“ˆâ“‰â“Šâ“‹â“Œâ“â“Žâ“â“â“‘â“’â““â“”â“•â“–â“—â“˜â“™â“šâ“›â“œâ“â“žâ“Ÿâ“ â“¡â“¢â“£â“¤â“¥â“¦â“§â“¨â“©";
-const char* pplus_smilies = "í¼ í±¿Ø‚í¼ í³¿Ø„í¼ íµ¿Ø†í¼ í·¿Øˆí¼ í¹¿ØŠí¼ í»¿ØŒí¼ í½¿ØŽí¼ í¿¿Øí¼¡í²¿Ø“í¼¡í´¿Ø–í¼¡í¸¿Øší¼¡í¼¿Øí¼¡í¾¿Ø í¼¢í±¿Ø¢í¼¢í³¿Ø¤í¼¢íµ¿Ø¨í¼¢í¹¿Øªí¼¢í»¿Ø­í¼£í°¿Ø±í¼£í²¿Ø³í¼£íµ¿Ø¶í¼£í·¿Ø¸í¼£í¹¿Øºí¼£í»¿Ø¼í¼£í½¿Ø¾í¼£í¿¿Ù€";
+const char* pplus_smilies = "ðŸ˜ðŸ˜‚ðŸ˜ƒðŸ˜„ðŸ˜…ðŸ˜†ðŸ˜‡ðŸ˜ˆðŸ˜‰ðŸ˜ŠðŸ˜‹ðŸ˜ŒðŸ˜ðŸ˜ŽðŸ˜ðŸ˜ðŸ˜’ðŸ˜“ðŸ˜”ðŸ˜–ðŸ˜˜ðŸ˜šðŸ˜œðŸ˜ðŸ˜žðŸ˜ ðŸ˜¡ðŸ˜¢ðŸ˜£ðŸ˜¤ðŸ˜¥ðŸ˜¨ðŸ˜©ðŸ˜ªðŸ˜«ðŸ˜­ðŸ˜°ðŸ˜±ðŸ˜²ðŸ˜³ðŸ˜µðŸ˜¶ðŸ˜·ðŸ˜¸ðŸ˜¹ðŸ˜ºðŸ˜»ðŸ˜¼ðŸ˜½ðŸ˜¾ðŸ˜¿ðŸ™€";
 
 const string msgplus_bold = "\x02";
 const string msgplus_italic = "\x05";
