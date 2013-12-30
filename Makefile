@@ -40,12 +40,14 @@ $(V8LIBS): google_v8/v8-read-only
 	cd google_v8/v8-read-only && make CXXFLAGS=-fPIC CPPFLAGS=-fPIC $(V8MODE) GYPFLAGS="-Duse_system_icu=1"
 
 $(OBJDIR)/%.o $(OBJDIR)/%.d: %.cc | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MMD -MP -c -o $(OBJDIR)/$*.o $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MMD -MP -c $< -o $(OBJDIR)/$*.o
 
 Release: $(OBJECTS) $(V8LIBS)
-	echo hi
 	$(CXX) -o pidgin_plus.so -z defs -shared -fPIC $(OBJECTS) $(LIBS) $(LINKS)
 
 clean cleanRelease:
 	 rm -rf .objs
 
+ifneq ($(MAKECMDGOALS),clean)
+-include $(OBJECTS:.o=.d)
+endif
