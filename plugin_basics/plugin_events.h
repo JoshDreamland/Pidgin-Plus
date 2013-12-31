@@ -22,6 +22,5 @@
 
 void plus_events_connect_signals(PurplePlugin*);
 void plus_events_disconnect_signals(PurplePlugin*);
-PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data);
 void plus_commands_register();
 void plus_commands_free();

@@ -1,7 +1,9 @@
-/*
- * Pidgin Plus! Plugin
+/**
+ * @file v8_shared.h
+ * Header declaring V8 objects and functions for use in all JS sources.
  *
- * Copyright (C) 2009 Josh Ventura
+ * @section License
+ * Copyright (C) 2009, 2013 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -24,18 +26,19 @@
 #include <string>
 using namespace std;
 
-//Assuming those who want to compile this have 
-//checked out V8 as per my well-hidden instruction
+// It is assumed those who want to compile this have 
+// checked out V8 as per my well-hidden instructions,
+// or that the makefile's process to do so actually works.
 #include "google_v8/v8-read-only/include/v8.h"
 
 using namespace v8;
 
+/// Get an std::string representation of any V8 Value.
 string ValueToStr(Handle<Value>);
+/// Get a C string representation of a V8 UTF-8 string, or if null, return the second parameter.
 const char* ToCString(const String::Utf8Value&, const char* = "<string conversion failed>");
 
-typedef void v8_funcresult;
-typedef const v8::FunctionCallbackInfo<Value>& v8_funcargs;
-
+/// A structure representing an instance of Google V8, packed with our extension functions.
 /// We'll only be using one of these, but the ctor does a lot, so we'll be allocating it dynamically.
 extern struct plus_v8_instance {
   Isolate*               isolate;  ///< Big-scale isolate. I think it's one per process.
@@ -62,12 +65,18 @@ extern struct plus_v8_instance {
   
 } *plus_v8_global;
 
+/// The return type required of all native (C++) JavaScript functions. Used in case the V8 API changes again.
+typedef void v8_funcresult;
+/// The arguments type required of all native (C++) JavaScript functions. Used in case the V8 API changes again.
+typedef const v8::FunctionCallbackInfo<Value>& v8_funcargs;
+
+/// Global V8 functions; functions which can be called assuming they are to operate inside our own isolate/context.
 namespace GV8 {
-  v8::Local<v8::String> String(std::string x);
-  v8::Local<v8::String> String(const char* x);
-  v8::Local<v8::String> String(Isolate *iso, std::string x);
-  v8::Local<v8::String> String(Isolate *iso, const char* x);
-  v8_funcresult Return(v8_funcargs args, Handle<Value> val);
+  v8::Local<v8::String> String(std::string x); ///< Construct a V8 String in our global scope from only a given std::string.
+  v8::Local<v8::String> String(const char* x); ///< Construct a V8 String in our global scope from only a given C string.
+  v8::Local<v8::String> String(Isolate *iso, std::string x); ///< Construct a V8 String in our global scope from a given std::string and isolate from anywhere. Offered in case the V8 API changes again.
+  v8::Local<v8::String> String(Isolate *iso, const char* x); ///< Construct a V8 String in our global scope from a given C string and isolate from anywhere. Offered in case the V8 API changes again.
+  v8_funcresult Return(v8_funcargs args, Handle<Value> val); ///< Return values through this function from your JS functions, eg, return GV8::Return(args, value). Offered in case the V8 API changes again.
 }
 
 #endif

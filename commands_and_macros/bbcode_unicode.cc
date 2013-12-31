@@ -24,18 +24,12 @@
 
 #include "bbcode_iface.h"
 #include "compatibility/codes.h"
-#include "bbcode_formatting.h"
+#include "bbcode_loaders.h"
 
 /// Utility function to make alphabetic replacements
 static void realphabet(string& str, const char* alphabet) {
   for (size_t i = 0; i < str.length(); i++)
   {
-    if (str[i] == '[') {
-      bbcode_tag::instance tag;
-      if (bbcode_tag::at(str.c_str(),i,tag))
-        i += tag.length-1;
-      continue;
-    }
     if (str[i] >= 'A' && str[i] <= 'Z') {
       char *r = g_utf8_substring(alphabet, str[i]-'A', str[i]-'A'+1);
       str.replace(i,1,r);

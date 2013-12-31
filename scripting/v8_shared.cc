@@ -1,7 +1,13 @@
-/*
- * Pidgin Plus! Plugin
- *
- * Copyright (C) 2009 Josh Ventura
+/**
+ * @file v8_shared.cc
+ * @brief Defines wrapper calls to simple V8 functionality.
+ * 
+ * This file defines some calls and variables that are shared
+ * by files in the /scripting/ directory. Some declarations here do
+ * more than they would suggest; see individual comments for details
+ * 
+ * @section License
+ * Copyright (C) 2009, 2013 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,15 +22,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
  *
- */
- 
- /**
-   @file v8_shared.cc
-   @brief Defines wrapper calls to simple V8 functionality.
-   
-   This file defines some calls and variables that are shared
-   by files in the /scripting/ directory. Some declarations here do
-   more than they would suggest; see individual comments for details
  */
  
 #include "v8_shared.h"

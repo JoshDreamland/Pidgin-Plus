@@ -1,7 +1,7 @@
 /*
  * Pidgin Plus! Plugin
  *
- * Copyright (C) 2009 Josh Ventura
+ * Copyright (C) 2009, 2013 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as

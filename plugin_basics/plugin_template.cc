@@ -6,8 +6,7 @@
  * little original code in this file as possible so it can be discarded
  * as a waste heap. Comments were left to help the curious navigate.
  *
- * Pidgin Plus! Plugin
- *
+ * @section License
  * Copyright (C) 2009 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or

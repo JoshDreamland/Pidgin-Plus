@@ -104,17 +104,11 @@ static gboolean writing_chat_msg(PurpleAccount *account, const char *, char **me
 
 
 
-
 /*
     Handle Plus!'s large array of commands
+    AKA Slash commands: anything given by /command, such as /all, /ping, or /online.
+    See commands.h / commands.cc
 */
-
-PurpleCmdRet slash_command_handler(PurpleConversation *conv, const gchar *cmd, gchar **args,	gchar *error, void *data)
-{
-  int a = execute_command(conv,cmd,args,error,data);
-  return a ? a == 2 ? PURPLE_CMD_RET_FAILED : PURPLE_CMD_RET_OK : PURPLE_CMD_RET_CONTINUE;
-}
-
 
 
 /*

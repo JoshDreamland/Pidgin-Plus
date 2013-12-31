@@ -38,10 +38,10 @@
 		</Unit>
 		<Unit filename="basics/basics.h" />
 		<Unit filename="commands_and_macros/bbcode_formatting.cc" />
-		<Unit filename="commands_and_macros/bbcode_formatting.h" />
 		<Unit filename="commands_and_macros/bbcode_iface.cc" />
 		<Unit filename="commands_and_macros/bbcode_iface.h" />
 		<Unit filename="commands_and_macros/bbcode_load.h" />
+		<Unit filename="commands_and_macros/bbcode_loaders.h" />
 		<Unit filename="commands_and_macros/bbcode_unicode.cc" />
 		<Unit filename="commands_and_macros/commands.cc" />
 		<Unit filename="commands_and_macros/commands.h" />

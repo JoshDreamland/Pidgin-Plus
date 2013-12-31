@@ -23,7 +23,7 @@
 **/
 
 #include "bbcode_iface.h"
-#include "bbcode_formatting.h"
+#include "bbcode_loaders.h"
 
 /// Struct defining the bold tag, [b].
 struct boldtag: bbcode_tag {

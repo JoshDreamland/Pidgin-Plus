@@ -22,8 +22,9 @@
  * along with this program; if not, see <www.gnu.org/licenses>
 */
 
-#include "bbcode_formatting.h"
 #include <cstdio>
+#include "bbcode_loaders.h"
+
 static void load_bbcode() {
   puts("Loading BBCode...");
   load_bb_formatting();

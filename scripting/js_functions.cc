@@ -1,6 +1,11 @@
-/*
- * Pidgin Plus! Plugin
+/**
+ * @file js_functions.cc
  *
+ * This file defines built-in functions that are to be accessable through JS.
+ * It is also responsible for setting allotted resources for each script, such
+ * as the number of messages that can be sent in one event.
+ *
+ * @section License
  * Copyright (C) 2009 Josh Ventura
  *
  * Pidgin Plus! is free software; you can redistribute it and/or
@@ -15,16 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <www.gnu.org/licenses>
- *
- */
-
-/**
-   @file js_functions.cc
-   @summary This file defines built-in functions that are to be
-     accessable through JS. It is also responsible for setting
-     allotted resources for each script, such as the number of
-     messages that can be sent in one event.
-*/
+**/
 
 #include "v8_shared.h"
 #include "js_functions.h"
