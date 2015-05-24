@@ -26,50 +26,80 @@
  
 #include "v8_shared.h"
 
-plus_v8_instance::plus_v8_instance():
-    isolate(Isolate::GetCurrent()),        // Step one:   Get isolate
-    scope(isolate),                        // Step two:   Create handleScope
-    global(ObjectTemplate::New(isolate)),  // Step three: Create global scope
-    context(),                             // Step four:  Create context; this is done in begin()
-    begun(0)                               // Which has not yet been invoked.
+PlusV8Instance::PlusV8Instance():
+    platform(makePlatform()),         // Step one:    Create platform
+    isolate(makeIsolate()),           // Step two:    Get isolate
+    isoscope(isolate),                // Step what:   Create isolate scope
+    scope(isolate),                   // Step three:  Create handleScope
+    global(makeObjTemplate(isolate)), // Step four:   Create global scope
+    context(),                  // Step five:   Create context; done in begin().
+    begun(false)
   {}
 
-void plus_v8_instance::begin() {
+Platform* PlusV8Instance::makePlatform() {
+  puts("- Initialize ICU");
+  v8::V8::InitializeICU();
+  
+  puts("- Request LibPlatform Platform");
+  Platform* const platform = platform::CreateDefaultPlatform();
+
+  puts("- Initialize V8 Platform");
+  V8::InitializePlatform(platform);
+  
+  puts("- Initialize V8");
+  V8::Initialize();
+  
+  return platform;
+}
+
+#include <string.h>
+class ArrayBufferAllocator : public v8::ArrayBuffer::Allocator {
+ public:
+  virtual void* Allocate(size_t length) {
+    void* data = AllocateUninitialized(length);
+    return data == NULL ? data : memset(data, 0, length);
+  }
+  virtual void* AllocateUninitialized(size_t length) { return malloc(length); }
+  virtual void Free(void* data, size_t) { free(data); }
+} main_allocator;
+
+Isolate* PlusV8Instance::makeIsolate() {
+  puts("- Create Main V8 Isolate");
+  Isolate::CreateParams create_params;
+  create_params.array_buffer_allocator = &main_allocator;
+  Isolate* isolate = Isolate::New(create_params);
+  return isolate;
+}
+
+PlusV8Instance::HObjTemplate PlusV8Instance::makeObjTemplate(Isolate* iso) {
+  puts("- Create Main Object Template");
+  return ObjectTemplate::New(iso);
+}
+
+void PlusV8Instance::begin() {
   if (!begun) {
     begun = 1;
-    context = Context::New(isolate, NULL, global);
+    puts("- Creating main context");
+    context = Context::New(isolate, nullptr, global);
+    puts("- Entering...");
     context->Enter();
   }
 }
 
-void plus_v8_instance::end() {
+void PlusV8Instance::end() {
   if (begun) {
     begun = 0;
     context->Exit();
   }
 }
 
-plus_v8_instance *plus_v8_global;
+PlusV8Instance *plus_v8_global;
 
-Local<String> plus_v8_instance::NewString(std::string str) {
+Local<String> PlusV8Instance::string(std::string str) {
   return String::NewFromUtf8(isolate, str.c_str());
 }
-Local<String> plus_v8_instance::NewString(const char* str) {
+Local<String> PlusV8Instance::string(const char* str) {
   return String::NewFromUtf8(isolate, str);
-}
-
-// Functions to work with strings, in case something new and fantastic happens to the V8 API
-Local<String> GV8::String(const char* str) {
-  return plus_v8_global->NewString(str);
-}
-Local<String> GV8::String(std::string str) {
-  return plus_v8_global->NewString(str);
-}
-Local<String> GV8::String(Isolate *iso, const char* str) {
-  return String::NewFromUtf8(iso, str);
-}
-Local<String> GV8::String(Isolate *iso, std::string str) {
-  return String::NewFromUtf8(iso, str.c_str());
 }
 
 v8_funcresult GV8::Return(v8_funcargs args, Handle<Value> val) {

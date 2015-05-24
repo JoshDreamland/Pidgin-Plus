@@ -100,8 +100,8 @@ inline int scountln(const char* s)
 static string strip_commands(string msg) {
   const char* uc; // Skip whitespace--get first non-white char
   for (uc = msg.c_str(); *uc and g_unichar_isspace(g_utf8_get_char(uc)); uc = g_utf8_next_char(uc));
-  if (*uc == '!' or *uc == '@' or *uc == '$')
-    return *uc + msg;
+  if (*uc == '!' or *uc == '@' or (*uc >= '#' and *uc <= '&') or *uc == '~')
+    return '.' + msg;
   return msg;
 }
 

@@ -45,29 +45,30 @@ Begin_JavaScript_Functions
 //{
     Begin_SubClass(version)
         static v8_funcresult toString(v8_funcargs args)  {
-          return GV8::Return(args, GV8::String(args.GetIsolate(), "Pidgin Plus! Version 0.00.01"));
+          return GV8::Return(args, String::NewFromUtf8(
+              args.GetIsolate(), "Pidgin Plus! Version 0.00.01"));
         }
         static v8_funcresult valueOf (v8_funcargs args)  {
-          return GV8::Return(args, Integer::New(5));
+          return GV8::Return(args, Integer::New(plus_v8_global->isolate, 5));
         }
         
-        void construct () {
-          me->Set(GV8::String(plus_v8_global->isolate, "toString"), FunctionTemplate::New(plus_v8_global->isolate, toString) );
-          me->Set(GV8::String(plus_v8_global->isolate, "valueOf"),  FunctionTemplate::New(plus_v8_global->isolate, valueOf)  );
+        void construct () override {
+          addFunction("toString", toString);
+          addFunction("valueOf",  valueOf);
         }
     End_SubClass(version)
     
     Begin_SubClass(v8version)
         static v8_funcresult toString(v8_funcargs args)  {
-          return GV8::Return(args, GV8::String((string("Google V8 version ") + V8::GetVersion()).c_str()));
+          return GV8::Return(args, plus_v8_global->string(string("Google V8 version ") + V8::GetVersion()));
         }
         static v8_funcresult valueOf (v8_funcargs args)  {
-          return GV8::Return(args, Number::New(vs_to_double(V8::GetVersion())));
+          return GV8::Return(args, Number::New(plus_v8_global->isolate, vs_to_double(V8::GetVersion())));
         }
         
-        void construct () {
-          me->Set(GV8::String("toString"), FunctionTemplate::New(toString) );
-          me->Set(GV8::String("valueOf"),  FunctionTemplate::New(valueOf)  );
+        void construct () override  {
+          addFunction("toString", toString);
+          addFunction("valueOf",  valueOf);
         }
     End_SubClass(v8version)
 //}

@@ -49,25 +49,35 @@ extern void pidgin_printf(const char*);
 
 map <string, PPlus_Script> scripts;
 
-//Functions
-static bool ExecuteString(string source, string name, bool print_result, bool report_exceptions);
+// Functions
+static bool ExecuteString(
+    string source, string name, bool print_result, bool report_exceptions);
 static void ReportException(TryCatch* handler);
 
-
+#include <cstdio>
 int plus_v8_init()
 {
-  v8::V8::InitializeICU();
-  plus_v8_global = new plus_v8_instance();
+  puts("Create main V8 instance");
+  plus_v8_global = new PlusV8Instance();
+  
+  puts("Initialize JS functions");
   js_functions_initialize();
+  
+  puts("Begin V8 instance");
   plus_v8_global->begin();
+  
+  puts("Completed");
   return 0;
 }
 
 string lastmessages[3];
 int plus_evaluate_js_line(const char* line)
 {
-  if (lastmessages[2] == lastmessages[1] and lastmessages[1] == lastmessages[0] and lastmessages[0] == line)
+  if (lastmessages[2] == lastmessages[1]
+   && lastmessages[1] == lastmessages[0]
+   && lastmessages[0] == line) {
     line = "\"Fuck you.\"";
+  }
   else {
     lastmessages[2] = lastmessages[1];
     lastmessages[1] = lastmessages[0];
@@ -89,8 +99,9 @@ intptr_t CALL_ID = 0;
 static gpointer kill_v8_if_it_takes_too_long(gpointer data)
 {
   usleep(1000000); // GNU only. Sorry, MSVS fans: go fuck yourselves.
-  if (CALL_ID == intptr_t(data))
-    V8::TerminateExecution();
+  if (CALL_ID == intptr_t(data)) {
+    V8::TerminateExecution(plus_v8_global->isolate);
+  }
   return NULL;
 }
 
@@ -107,7 +118,9 @@ int plus_v8_wipe() {
 //Returns true if successful
 static bool load_script(string source, string name)
 {
-  Handle<Script> scr = Script::Compile(GV8::String(source.c_str()), GV8::String(name.c_str()));
+  Handle<Script> scr = Script::Compile(
+      plus_v8_global->string(source),
+      plus_v8_global->string(name));
   if (scr.IsEmpty())
     return 0;
   scripts[name].script = scr;
@@ -130,8 +143,8 @@ bool ExecuteString(string source, string name, bool print_result, bool report_ex
       g_thread_new("kill-v8-if-it-takes-too-long", kill_v8_if_it_takes_too_long, (gpointer)CALL_ID);
       result = scripts[name].script->Run();
       CALL_ID++;
-    } catch(int x) { result = GV8::String("A system exception was thrown."); }
-      catch(const char* x) { result = GV8::String(x); }
+    } catch(int x) { result = plus_v8_global->string("A system exception was thrown."); }
+      catch(const char* x) { result = plus_v8_global->string(x); }
     
     if (result.IsEmpty())
     {

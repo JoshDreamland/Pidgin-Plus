@@ -29,7 +29,13 @@ using namespace std;
 // It is assumed those who want to compile this have 
 // checked out V8 as per my well-hidden instructions,
 // or that the makefile's process to do so actually works.
-#include "google_v8/v8-read-only/include/v8.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wundef"
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <include/v8.h>
+#include <include/libplatform/libplatform.h>
+#pragma GCC diagnostic pop
 
 using namespace v8;
 
@@ -40,11 +46,21 @@ const char* ToCString(const String::Utf8Value&, const char* = "<string conversio
 
 /// A structure representing an instance of Google V8, packed with our extension functions.
 /// We'll only be using one of these, but the ctor does a lot, so we'll be allocating it dynamically.
-extern struct plus_v8_instance {
-  Isolate*               isolate;  ///< Big-scale isolate. I think it's one per process.
-  HandleScope            scope;    ///< I don't know why this is required here, but it's important.
-  Handle<ObjectTemplate> global;   ///< This is the thing we add objects into, then pass to Context::New.
-  Handle<Context>        context;  ///< Finally, the context, which depends on everything above. Initialized in begin().
+extern class PlusV8Instance {
+  
+  typedef Handle<ObjectTemplate> HObjTemplate;
+  
+  static Platform    *makePlatform();
+  static Isolate     *makeIsolate();
+  static HObjTemplate makeObjTemplate(Isolate*);
+
+ public:
+  Platform* const      platform; ///< The main V8 platform. I never really use this.
+  Isolate* const       isolate;  ///< Big-scale isolate. I think it's one per process.
+  const Isolate::Scope isoscope; ///< Is this really necessary?
+  const HandleScope    scope;    ///< Cannot create a handle without a HandleScope
+  const HObjTemplate   global;   ///< This is the thing we add objects into, then pass to Context::New.
+  Handle<Context>      context;  ///< Finally, the context, which depends on everything above. Initialized in begin().
   
   /// Creates and enters the context; must be called AFTER defining all functions, etc.
   void begin();
@@ -53,12 +69,12 @@ extern struct plus_v8_instance {
   
   // Prevent getting bitten by changes to the V8 API.
   /// Construct a V8 String from an std::string.
-  Local<String> NewString(std::string str);
+  Local<String> string(std::string str);
   /// Construct a V8 String from a C string.
-  Local<String> NewString(const char* str);
+  Local<String> string(const char* str);
   
   /// Construct, creating a bunch of V8 stuff.
-  plus_v8_instance();
+  PlusV8Instance();
   
   private:
     bool begun;
@@ -72,10 +88,6 @@ typedef const v8::FunctionCallbackInfo<Value>& v8_funcargs;
 
 /// Global V8 functions; functions which can be called assuming they are to operate inside our own isolate/context.
 namespace GV8 {
-  v8::Local<v8::String> String(std::string x); ///< Construct a V8 String in our global scope from only a given std::string.
-  v8::Local<v8::String> String(const char* x); ///< Construct a V8 String in our global scope from only a given C string.
-  v8::Local<v8::String> String(Isolate *iso, std::string x); ///< Construct a V8 String in our global scope from a given std::string and isolate from anywhere. Offered in case the V8 API changes again.
-  v8::Local<v8::String> String(Isolate *iso, const char* x); ///< Construct a V8 String in our global scope from a given C string and isolate from anywhere. Offered in case the V8 API changes again.
   v8_funcresult Return(v8_funcargs args, Handle<Value> val); ///< Return values through this function from your JS functions, eg, return GV8::Return(args, value). Offered in case the V8 API changes again.
 }
 

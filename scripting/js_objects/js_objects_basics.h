@@ -45,7 +45,13 @@ struct jsObject_basic
 struct jsSubClass_basic
 {
   Handle<ObjectTemplate> me; // A handle to this object in the JavaScript
-  virtual void construct();
+  virtual void construct() = 0;
+  
+ protected:
+  inline void addFunction(const char* name, FunctionCallback func) {
+    me->Set(String::NewFromUtf8  (plus_v8_global->isolate, name),
+            FunctionTemplate::New(plus_v8_global->isolate, func));
+  }
 };
 
 

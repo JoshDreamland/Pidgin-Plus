@@ -204,8 +204,9 @@ bool filter_message(int mflags, int window_type, PurpleAccount *account, const c
   
   g_free(*message);
   const char *src = msg.c_str();
-  *message = g_new(char,msg.length() + not(*src == '/' and (mflags & MSG_MINE)));
-  memcpy(*message, src + (*src == '/' and (mflags & MSG_MINE)), msg.length() + not(*src == '/' and (mflags & MSG_MINE)));
+  int skip_slash = (*src == '/' and (mflags & MSG_MINE));
+  *message = g_new(char, msg.length() + !skip_slash); // Keep /me
+  memcpy(*message, src + skip_slash, msg.length() + !skip_slash);
   return false;
 }
 

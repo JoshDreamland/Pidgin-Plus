@@ -44,7 +44,8 @@ Begin_JavaScript_Functions
       int linesprinted = pidgin_printf(cstr.c_str());
         prints_remaining -= linesprinted ? linesprinted : 1;
         if (prints_remaining <= 0)
-          return void(iso->ThrowException(GV8::String(iso, "Too many messages sent in one script event")));
+          return void(iso->ThrowException(
+              String::NewFromUtf8(iso, "Too many messages sent in one script event")));
       }
     }
 //}

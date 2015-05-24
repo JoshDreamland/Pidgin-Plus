@@ -277,7 +277,10 @@ pplus_command::~pplus_command() {
     rit->second = NULL;
 }
 
-PurpleCmdRet pplus_command::perform(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *uu1, void *uu2) { return PURPLE_CMD_RET_FAILED; }
+PurpleCmdRet pplus_command::perform(
+    PurpleConversation*, const gchar*, gchar**, gchar*, void*) {
+  return PURPLE_CMD_RET_FAILED;
+}
 
 /// Purple callback function to execute a command.
 PurpleCmdRet execute_command(PurpleConversation *conv, const gchar *cmd, gchar **args, gchar *uu1, void *uu2)

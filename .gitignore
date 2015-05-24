@@ -2,6 +2,7 @@
 
 .objs
 
-google_v8/v8-read-only/
+v8/
+.gclient*
 
 *.so
