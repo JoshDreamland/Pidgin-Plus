@@ -30,8 +30,6 @@ SOURCES += $(wildcard scripting/js_objects/*.cc)
 OBJECTS = $(addprefix $(OBJDIR)/,$(patsubst %.cc, %.o, $(SOURCES)))
 OBJDIRS = $(sort $(dir $(OBJECTS)))
 
-export PATH := `pwd`depot_tools:$(PATH)
-
 default: Release
 
 $(OBJDIR): $(OBJDIRS)
@@ -40,11 +38,16 @@ $(OBJDIRS):
 	mkdir -p $@
 
 depot_tools:
-	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git $@
 v8: depot_tools
-	fetch v8
-$(V8LIBS): v8
+	export PATH=`pwd`/depot_tools:$(PATH); \
+	if [ -d "v8" ]; then                   \
+	  gclient sync;                        \
+	else                                   \
+	  fetch v8;                            \
+	fi
 	cd v8 && make $(V8MODE) library=static CFLAGS="-fPIC" CXXFLAGS="-fPIC" -j 4
+$(V8LIBS): v8
 
 $(OBJDIR)/%.o $(OBJDIR)/%.d: %.cc | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MMD -MP -c $< -o $(OBJDIR)/$*.o
