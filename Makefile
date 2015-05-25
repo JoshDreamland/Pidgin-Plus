@@ -30,6 +30,8 @@ SOURCES += $(wildcard scripting/js_objects/*.cc)
 OBJECTS = $(addprefix $(OBJDIR)/,$(patsubst %.cc, %.o, $(SOURCES)))
 OBJDIRS = $(sort $(dir $(OBJECTS)))
 
+export PATH := `pwd`depot_tools:$(PATH)
+
 default: Release
 
 $(OBJDIR): $(OBJDIRS)
@@ -40,7 +42,6 @@ $(OBJDIRS):
 depot_tools:
 	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 v8: depot_tools
-	export PATH := `pwd`depot_tools:$(PATH)
 	fetch v8
 $(V8LIBS): v8
 	cd v8 && make $(V8MODE) library=static CFLAGS="-fPIC" CXXFLAGS="-fPIC" -j 4
@@ -48,8 +49,10 @@ $(V8LIBS): v8
 $(OBJDIR)/%.o $(OBJDIR)/%.d: %.cc | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MMD -MP -c $< -o $(OBJDIR)/$*.o
 
-Release: $(OBJECTS) $(V8LIBS)
+pidgin_plus.so: $(OBJECTS) $(V8LIBS)
 	$(CXX) -o pidgin_plus.so -z defs -shared -fPIC $(OBJECTS) $(LIBS) $(LINKS)
+
+Release: pidgin_plus.so
 
 clean cleanRelease:
 	 rm -rf .objs
